@@ -32,7 +32,7 @@ export class UsersController {
     return this.usersService.findUsers();
   }
 
-  @Get('user/:userId')
+  @Get('/:userId')
   @ApiOperation({ summary: 'get user by id' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Success', type: User })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad Request' })
@@ -45,7 +45,7 @@ export class UsersController {
     return this.usersService.findById(userId);
   }
 
-  @Delete('user/:userId')
+  @Delete('/:userId')
   @ApiOperation({ summary: 'get user by id' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Success', type: User })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad Request' })
