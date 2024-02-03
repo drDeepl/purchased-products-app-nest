@@ -1,0 +1,66 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model User{
+  id Int @id @default(autoincrement())
+  username String @unique @db.VarChar(64)
+  passwordHash String @map("password_hash")
+  isAdmin Boolean @default(false) @map("is_admin")
+  purchasedProducts PurchasedProduct[]
+
+  @@map("users")
+}
+
+model Category{
+  id Int @id @default(autoincrement())
+  name String @unique
+  products Product[]
+
+  @@map("categories")
+}
+
+model Product{
+  id Int @id @default(autoincrement())
+  name String @unique
+  category Category @relation(fields: [categoryId], references: [id])
+  categoryId Int @map("category_id")
+  
+  purchasedProducts PurchasedProduct[]
+
+  @@map("products")
+}
+
+model MeasurementUnit{
+  id Int @id @default(autoincrement())
+  name String @unique
+
+  purchasedProducts PurchasedProduct[]
+
+  @@map("measurement_units")
+}
+
+
+model PurchasedProduct{
+  id Int @id @default(autoincrement())
+  user User @relation(fields: [userId], references: [id])
+  userId Int @map("user_id")
+  product Product @relation(fields: [productId], references: [id])
+  productId Int @map("product_id")
+  count Int 
+  unitMeasurement MeasurementUnit @relation(fields: [unitMeasurementId], references: [id])
+  unitMeasurementId Int @map("unit_measurement_id")
+  price Float @db.DoublePrecision
+  purchaseDate DateTime @db.Timestamp() @map("purchase_date")
+
+  @@map("purchased_products")
+}
