@@ -16,16 +16,16 @@ import { UserDto } from './dto/user.dto';
 import { User } from './entites/user.entity';
 import { UserService } from './user.service';
 
+@ApiTags('UserController')
 @UseGuards(AuthGuard('jwt'))
-@ApiTags('Users')
 @Controller('api/user')
 export class UserController {
-  private readonly logger = new Logger('USERS.CONTROLLER');
+  private readonly logger = new Logger('USER.CONTROLLER');
 
   constructor(private readonly userService: UserService) {}
 
   @Get('/me')
-  @ApiOperation({ summary: 'get current user info' })
+  @ApiOperation({ summary: 'получение информации о текущем пользователе' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Success', type: UserDto })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad Request' })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
@@ -52,7 +52,7 @@ export class UserController {
   }
 
   @Delete('/:userId')
-  @ApiOperation({ summary: 'get user by id' })
+  @ApiOperation({ summary: 'delete user by id' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Success', type: User })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad Request' })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
