@@ -16,6 +16,7 @@ model User{
   username String @unique @db.VarChar(64)
   passwordHash String @map("password_hash")
   isAdmin Boolean @default(false) @map("is_admin")
+  refreshTokenHash String?  @db.VarChar(255)  @map("refresh_token_hash")
   purchasedProducts PurchasedProduct[]
 
   @@map("users")
