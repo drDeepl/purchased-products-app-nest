@@ -1,4 +1,4 @@
-import { UserDto } from '@/user/dto/user.dto';
+import { UserDto } from '@/user/dto/UserDto';
 import {
   Body,
   Controller,
@@ -52,14 +52,14 @@ export class AuthController {
     return this.authService.signUp(dto);
   }
 
-  @ApiOperation({ summary: 'request to update access token' })
+  @ApiOperation({ summary: 'запрос на обновление access token' })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Success',
     type: TokensDto,
   })
-  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad Request' })
-  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED })
   @UseGuards(AuthGuard('jwt-refresh'))
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
@@ -69,7 +69,7 @@ export class AuthController {
     return this.authService.refreshTokens(user['sub'], user['refreshToken']);
   }
 
-  @ApiOperation({ summary: 'request to clear refreshTokenHash' })
+  @ApiOperation({ summary: 'запрос на удаление refresh token у пользователя' })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Success',

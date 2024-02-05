@@ -9,7 +9,7 @@ import { Tokens } from './types';
 
 @Injectable()
 export class AuthService {
-  private readonly logger = new Logger('AUTH.SERVICE');
+  private readonly logger = new Logger('AuthService');
   constructor(
     private jwtService: JwtService,
     private configService: ConfigService,

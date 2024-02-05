@@ -7,6 +7,7 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { DontKnowExceptionMsg } from '@/util/MessageConstants';
 import { AddProductDto } from './dto/AddProductDto';
 import { AddedProductDto } from './dto/AddedProductDto';
+import { EditProductDto } from './dto/EditProductDto';
 
 @Injectable()
 export class ProductService {
@@ -40,6 +41,51 @@ export class ProductService {
           }
         }
         this.logger.error(error);
+      })
+      .then((result: AddedProductDto) => result);
+  }
+
+  async editProduct(
+    productId: number,
+    editProductDto: EditProductDto,
+  ): Promise<AddedProductDto> {
+    this.logger.verbose('EDIT PRODUCT');
+    return this.prisma.product
+      .update({
+        data: {
+          name: editProductDto.name,
+          categoryId: editProductDto.categoryId,
+        },
+        where: {
+          id: productId,
+        },
+      })
+      .catch((error) => {
+        this.logger.error(`name: ${error.name}\ncode: ${error.code}`);
+        this.logger.error(error);
+        if (error instanceof PrismaClientKnownRequestError) {
+          if (error.code === 'P2002') {
+            throw new HttpException(
+              'выбранное имя уже существует',
+              HttpStatus.BAD_REQUEST,
+            );
+          } else if (error.code === 'P2003') {
+            throw new HttpException(
+              'выбранной категории не существует',
+              HttpStatus.BAD_REQUEST,
+            );
+          } else if (error.code === 'P2025') {
+            throw new HttpException(
+              'выбранного продукта не существует',
+              HttpStatus.BAD_REQUEST,
+            );
+          }
+        } else {
+          throw new HttpException(
+            'что-то пошло не так',
+            HttpStatus.BAD_GATEWAY,
+          );
+        }
       })
       .then((result: AddedProductDto) => result);
   }

@@ -9,6 +9,7 @@ import {
   HttpStatus,
   Logger,
   Param,
+  ParseIntPipe,
   Post,
   UseGuards,
 } from '@nestjs/common';
@@ -28,6 +29,7 @@ import { Prisma } from '@prisma/client';
 import { AddProductDto } from './dto/AddProductDto';
 import { AddedProductDto } from './dto/AddedProductDto';
 import { BadRequestDto } from '@/dto/BadRequestDto';
+import { EditProductDto } from './dto/EditProductDto';
 
 @ApiTags('ProductController')
 @UseGuards(AuthGuard('jwt'))
@@ -55,6 +57,27 @@ export class ProductController {
   ): Promise<AddedProductDto> {
     this.logger.verbose('ADD PRODUCT');
     return this.productService.addProduct(addProductDto);
+  }
+
+  @Post('edit/:productId')
+  @ApiOperation({ summary: 'добавление продукта' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: AddedProductDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    type: BadRequestDto,
+  })
+  async editProduct(
+    @Body() editProductDto: EditProductDto,
+    @Param('productId', ParseIntPipe) productId: number,
+  ): Promise<AddedProductDto> {
+    this.logger.verbose('ADD PRODUCT');
+    return this.productService.editProduct(productId, editProductDto);
   }
 
   @Post('category/add')

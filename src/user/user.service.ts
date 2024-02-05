@@ -1,9 +1,6 @@
-// import { PrismaService } from '@/prisma/prisma.service';
-
 import { PrismaService } from '@/prisma/prisma.service';
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
-import { UserDto } from './dto/user.dto';
-import { User } from './entites/user.entity';
+import { UserDto } from './dto/UserDto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
@@ -12,9 +9,9 @@ export class UserService {
 
   constructor(private prisma: PrismaService) {}
 
-  async findUsers(): Promise<User[]> {
+  async findUsers(): Promise<UserDto[]> {
     this.logger.verbose('findUsers');
-    const users: User[] = await this.prisma.user.findMany();
+    const users: UserDto[] = await this.prisma.user.findMany();
     return users;
   }
 
@@ -35,7 +32,6 @@ export class UserService {
       throw new HttpException(
         {
           status: HttpStatus.NOT_FOUND,
-          error: 'User not found',
         },
         HttpStatus.NOT_FOUND,
       );
@@ -43,7 +39,7 @@ export class UserService {
     return user;
   }
 
-  async deleteUser(userId: number): Promise<String> {
+  async deleteUser(userId: number): Promise<string> {
     this.logger.verbose('deleteUser');
     return this.prisma.user
       .delete({ where: { id: userId } })

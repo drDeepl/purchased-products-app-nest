@@ -14,8 +14,7 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { AuthGuard } from '@nestjs/passport';
 import { UserAccess } from './decorators/user.decorator';
-import { UserDto } from './dto/user.dto';
-import { User } from './entites/user.entity';
+import { UserDto } from './dto/UserDto';
 import { UserService } from './user.service';
 
 @ApiTags('UserController')
@@ -55,7 +54,7 @@ export class UserController {
 
   @Delete('delete/:userId')
   @ApiOperation({ summary: 'delete user by id' })
-  @ApiResponse({ status: HttpStatus.OK, type: User })
+  @ApiResponse({ status: HttpStatus.OK, type: UserDto })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED })
   @ApiResponse({ status: HttpStatus.NOT_FOUND })

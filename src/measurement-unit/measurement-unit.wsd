@@ -1,0 +1,35 @@
+@startuml MeasurementUnit
+
+class MeasurementUnitService {
+  - logger: Logger
+  - prisma: PrismaService
+
+  + createMeasurementUnit(addMeasurementUnitDto: AddMeasurementUnitDto): Promise<AddedMeasurementUnit>
+  + getMeasurementUnits(): Promise<AddedMeasurementUnitDto[]>
+  + delete(measurementUnitId: number)
+}
+
+class MeasurementUnitController {
+  - measurementUnitService: MeasurementUnitService
+  - logger: Logger
+  + addMeasurementUnit(addMeasurementUnitDto: AddMeasurementUnitDto)
+  + getMeasurementUnit(): Promise<AddedMeasurementUnitDto[]>
+  + deleteMeasurementUnitById(measurementUnitId: number)
+}
+
+MeasurementUnitController --> MeasurementUnitService
+
+class BaseMeasurementUnitDto{
+    +name: string
+}
+
+class AddMeasurementUnitDto{}
+
+class AddedMeasurementUnitDto{
+    +id: number
+}
+
+BaseMeasurementUnitDto <|-- AddMeasurementUnitDto
+BaseMeasurementUnitDto <|-- AddedMeasurementUnitDto
+
+@enduml
