@@ -4,6 +4,10 @@ import { Prisma } from '@prisma/client';
 import { AddCategoryDto } from './dto/AddCategoryDto';
 import { CategoryDto } from './dto/CategoryDto';
 import { EditCategoryDto } from './dto/EditCategoryDto';
+import { ValidationError, isEmpty, validate } from 'class-validator';
+import { EmptyFieldsException } from '@/exception/EmptyFieldsException';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { DontKnowExceptionMsg } from '@/util/MessageConstants';
 
 @Injectable()
 export class ProductService {
@@ -13,11 +17,29 @@ export class ProductService {
 
   async addCategory(addCategoryDto: AddCategoryDto): Promise<CategoryDto> {
     this.logger.verbose('ADD CATEGORY DTO');
-    return this.prisma.category.create({
-      data: {
-        name: addCategoryDto.name,
-      },
-    });
+    if (isEmpty(addCategoryDto.name)) {
+      throw new EmptyFieldsException('название категории не может быть пустым');
+    }
+
+    try {
+      return await this.prisma.category.create({
+        data: {
+          name: addCategoryDto.name,
+        },
+      });
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        if (error['code'] == 'P2002') {
+          throw new HttpException(
+            'категория с таким названием уже существует',
+            HttpStatus.FORBIDDEN,
+          );
+        }
+      } else {
+        console.log(error);
+        throw new HttpException(DontKnowExceptionMsg, HttpStatus.BAD_GATEWAY);
+      }
+    }
   }
 
   async getCategories(): Promise<CategoryDto[]> {
@@ -27,24 +49,27 @@ export class ProductService {
 
   async deleteCategory(categoryId: number) {
     this.logger.verbose('DELETE CATEGORY');
-    try {
-      return this.prisma.category.delete({
+
+    return this.prisma.category
+      .delete({
         where: {
           id: categoryId,
         },
+      })
+      .catch((error) => {
+        this.logger.error(error);
+        if (error instanceof PrismaClientKnownRequestError) {
+          throw new HttpException(
+            'данной категории не существует',
+            HttpStatus.NOT_FOUND,
+          );
+        } else {
+          throw new HttpException(
+            'что-то пошло не так',
+            HttpStatus.BAD_GATEWAY,
+          );
+        }
       });
-    } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        throw new HttpException(
-          'данной категории не существует',
-          HttpStatus.NOT_FOUND,
-        );
-      } else {
-        throw new HttpException('что-то пошло не так', HttpStatus.BAD_GATEWAY);
-      }
-    } finally {
-      return;
-    }
   }
 
   async editCategory(

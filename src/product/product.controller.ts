@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   HttpCode,
+  HttpException,
   HttpStatus,
   Logger,
   Param,
@@ -15,6 +16,9 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AddCategoryDto } from './dto/AddCategoryDto';
 import { CategoryDto } from './dto/CategoryDto';
 import { ProductService } from './product.service';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { DontKnowExceptionMsg } from '@/util/MessageConstants';
+import { Prisma } from '@prisma/client';
 
 @ApiTags('ProductController')
 @UseGuards(AuthGuard('jwt'))
@@ -28,19 +32,21 @@ export class ProductController {
   @ApiOperation({ summary: 'добавление категории' })
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'Success',
     type: CategoryDto,
   })
-  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Есть пустые поля в теле запроса',
+  })
   async addNewCategory(
     @Body() addCategory: AddCategoryDto,
   ): Promise<CategoryDto> {
     this.logger.verbose('ADD CATEGORY REQUEST');
-    try {
-      return this.productService.addCategory(addCategory);
-    } catch (error) {
-      console.log(`error name: ${error['name']}`);
-    }
+
+    return await this.productService.addCategory(addCategory);
   }
 
   @Get('category/all')
@@ -57,8 +63,6 @@ export class ProductController {
   }
 
   @Delete('category/delete/:categoryId')
-  @HttpCode(HttpStatus.NOT_FOUND)
-  @HttpCode(HttpStatus.BAD_GATEWAY)
   @ApiOperation({ summary: 'удаление категории' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -71,8 +75,8 @@ export class ProductController {
     status: HttpStatus.NOT_FOUND,
     description: 'Not found category with current id',
   })
-  deleteCategoryById(@Param('categoryId') categoryId: number) {
+  async deleteCategoryById(@Param('categoryId') categoryId: number) {
     this.logger.verbose('DELETE CATEGORY');
-    this.productService.deleteCategory(Number(categoryId));
+    return this.productService.deleteCategory(Number(categoryId));
   }
 }

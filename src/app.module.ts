@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ProductModule } from './product/product.module';
 import { UserModule } from './user/user.module';
+import { MeasurementUnitModule } from './measurement-unit/measurement-unit.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { UserModule } from './user/user.module';
     }),
     PrismaModule,
     ProductModule,
+    MeasurementUnitModule,
   ],
   controllers: [AppController],
   providers: [AppService],

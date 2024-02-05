@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class AddCategoryDto {
+export class AddMeasurementUnitDto {
   @ApiProperty({ description: '', nullable: false })
   name: string;
 }
