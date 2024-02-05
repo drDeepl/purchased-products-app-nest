@@ -1,8 +1,3 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty } from 'class-validator';
+import { BaseCategoryDto } from './BaseCategoryDto';
 
-export class EditCategoryDto {
-  @ApiProperty({ description: '', nullable: false })
-  @IsNotEmpty()
-  name: string;
-}
+export class EditCategoryDto extends BaseCategoryDto {}

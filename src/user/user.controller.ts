@@ -3,9 +3,11 @@ import {
   Delete,
   Get,
   HttpCode,
+  HttpException,
   HttpStatus,
   Logger,
   Param,
+  ParseIntPipe,
   UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -26,24 +28,24 @@ export class UserController {
 
   @Get('/me')
   @ApiOperation({ summary: 'получение информации о текущем пользователе' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Success', type: UserDto })
-  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad Request' })
-  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
-  @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Not found user' })
+  @ApiResponse({ status: HttpStatus.OK, type: UserDto })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND })
   @HttpCode(HttpStatus.OK)
   @HttpCode(HttpStatus.FORBIDDEN)
-  getCurrentUserInfo(@UserAccess() userAccess): Promise<UserDto> {
+  getCurrentUserInfo(@UserAccess() userAccessTokenData): Promise<UserDto> {
     this.logger.verbose('GET CURRENT USER INFO');
-    const userId = userAccess.sub;
+    const userId = userAccessTokenData.sub;
     return this.userService.findById(userId);
   }
 
   @Get('/:userId')
   @ApiOperation({ summary: 'get user by id' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Success', type: UserDto })
-  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad Request' })
-  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
-  @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Not found user' })
+  @ApiResponse({ status: HttpStatus.OK, type: UserDto })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND })
   @HttpCode(HttpStatus.OK)
   @HttpCode(HttpStatus.NOT_FOUND)
   findUserById(@Param('userId') userId: number): Promise<UserDto> {
@@ -51,16 +53,22 @@ export class UserController {
     return this.userService.findById(userId);
   }
 
-  @Delete('/:userId')
+  @Delete('delete/:userId')
   @ApiOperation({ summary: 'delete user by id' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Success', type: User })
-  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad Request' })
-  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
-  @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Not found user' })
+  @ApiResponse({ status: HttpStatus.OK, type: User })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND })
   @HttpCode(HttpStatus.OK)
   @HttpCode(HttpStatus.NOT_FOUND)
-  deleteUser(@Param('userId') userId: string) {
+  deleteUser(
+    @Param('userId', ParseIntPipe) userId: number,
+    @UserAccess() userAccessTokenData,
+  ) {
     this.logger.verbose('deleteUser');
-    return this.userService.deleteUser(Number(userId));
+    if (userId === userAccessTokenData.sub || userAccessTokenData.isAdmin) {
+      return this.userService.deleteUser(userId);
+    }
+    throw new HttpException('недостаточно прав', HttpStatus.FORBIDDEN);
   }
 }

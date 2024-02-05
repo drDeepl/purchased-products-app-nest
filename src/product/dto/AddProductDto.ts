@@ -1,11 +1,3 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber } from 'class-validator';
+import { BaseProductDto } from './BaseProductDto';
 
-export class AddProductDto {
-  @ApiProperty({ description: '', nullable: false })
-  @IsNotEmpty()
-  name: string;
-  @ApiProperty({ description: '', nullable: false })
-  @IsNumber()
-  categoryId: number;
-}
+export class AddProductDto extends BaseProductDto {}

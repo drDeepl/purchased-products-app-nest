@@ -14,7 +14,7 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { MeasurementUnitService } from './measurement-unit.service';
 import { AddedMeasurementUnitDto } from './dto/AddedMeasurementUnitDto';
 import { AddMeasurementUnitDto } from './dto/AddMeasurementUnitDto';
-import { IsNumber, isNumberString } from 'class-validator';
+import { BadRequestDto } from '@/dto/BadRequestDto';
 
 @ApiTags('MeasurementUnitController')
 @UseGuards(AuthGuard('jwt'))
@@ -36,8 +36,9 @@ export class MeasurementUnitController {
     status: HttpStatus.UNAUTHORIZED,
   })
   @ApiResponse({
-    status: HttpStatus.FORBIDDEN,
-    description: 'Есть пустые поля в теле запроса',
+    status: HttpStatus.BAD_REQUEST,
+    type: BadRequestDto,
+    description: 'так же может быть из-за пустых полей в теле запроса',
   })
   async addMeasurementUnit(
     @Body() addMeasurementUnitDto: AddMeasurementUnitDto,

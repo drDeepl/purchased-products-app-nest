@@ -4,6 +4,7 @@ import { PrismaService } from '@/prisma/prisma.service';
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { UserDto } from './dto/user.dto';
 import { User } from './entites/user.entity';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class UserService {
@@ -42,18 +43,22 @@ export class UserService {
     return user;
   }
 
-  async deleteUser(userId: number) {
+  async deleteUser(userId: number): Promise<String> {
     this.logger.verbose('deleteUser');
-    try {
-      return await this.prisma.user.delete({ where: { id: userId } });
-    } catch (error) {
-      throw new HttpException(
-        {
-          status: HttpStatus.NOT_FOUND,
-          error: 'User not found',
-        },
-        HttpStatus.NOT_FOUND,
-      );
-    }
+    return this.prisma.user
+      .delete({ where: { id: userId } })
+      .catch((error) => {
+        this.logger.error(`name: ${error.name}\ncode: ${error.code}`);
+        if (error instanceof PrismaClientKnownRequestError) {
+          if (error.code == 'P2003') {
+            throw new HttpException(
+              'данного пользователя не существует',
+              HttpStatus.FORBIDDEN,
+            );
+          }
+        }
+        this.logger.error(error);
+      })
+      .then(() => 'пользователь удален');
   }
 }

@@ -1,10 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { BaseProductDto } from './BaseProductDto';
 
-export class AddedProductDto {
+export class AddedProductDto extends BaseProductDto {
   @ApiProperty({ description: '', nullable: false })
   id: number;
-  @ApiProperty({ description: '', nullable: false })
-  name: string;
-  @ApiProperty({ description: '', nullable: false })
-  categoryId: number;
 }

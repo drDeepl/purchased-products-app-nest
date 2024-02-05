@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -12,13 +13,21 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { AddCategoryDto } from './dto/AddCategoryDto';
 import { CategoryDto } from './dto/CategoryDto';
 import { ProductService } from './product.service';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { DontKnowExceptionMsg } from '@/util/MessageConstants';
 import { Prisma } from '@prisma/client';
+import { AddProductDto } from './dto/AddProductDto';
+import { AddedProductDto } from './dto/AddedProductDto';
+import { BadRequestDto } from '@/dto/BadRequestDto';
 
 @ApiTags('ProductController')
 @UseGuards(AuthGuard('jwt'))
@@ -27,6 +36,26 @@ export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   private readonly logger = new Logger('ProductController');
+
+  @Post('add')
+  @ApiOperation({ summary: 'добавление продукта' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: CategoryDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    type: BadRequestDto,
+  })
+  async addProduct(
+    @Body() addProductDto: AddProductDto,
+  ): Promise<AddedProductDto> {
+    this.logger.verbose('ADD PRODUCT');
+    return this.productService.addProduct(addProductDto);
+  }
 
   @Post('category/add')
   @ApiOperation({ summary: 'добавление категории' })
@@ -38,8 +67,8 @@ export class ProductController {
     status: HttpStatus.UNAUTHORIZED,
   })
   @ApiResponse({
-    status: HttpStatus.FORBIDDEN,
-    description: 'Есть пустые поля в теле запроса',
+    status: HttpStatus.BAD_REQUEST,
+    type: BadRequestDto,
   })
   async addNewCategory(
     @Body() addCategory: AddCategoryDto,
@@ -53,10 +82,9 @@ export class ProductController {
   @ApiOperation({ summary: 'получение списка категорий' })
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'Success',
     type: CategoryDto,
   })
-  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED })
   findCategories(): Promise<CategoryDto[]> {
     this.logger.verbose('FIND CATEGORIES');
     return this.productService.getCategories();
@@ -66,14 +94,21 @@ export class ProductController {
   @ApiOperation({ summary: 'удаление категории' })
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'Success',
+
     type: CategoryDto,
   })
-  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
-  @ApiResponse({ status: HttpStatus.BAD_GATEWAY, description: 'Unknow Error' })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_GATEWAY,
+  })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
-    description: 'Not found category with current id',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    type: BadRequestDto,
   })
   async deleteCategoryById(@Param('categoryId') categoryId: number) {
     this.logger.verbose('DELETE CATEGORY');

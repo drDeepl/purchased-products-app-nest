@@ -1,13 +1,12 @@
 import { PrismaService } from '@/prisma/prisma.service';
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
 import { AddCategoryDto } from './dto/AddCategoryDto';
 import { CategoryDto } from './dto/CategoryDto';
 import { EditCategoryDto } from './dto/EditCategoryDto';
-import { ValidationError, isEmpty, validate } from 'class-validator';
-import { EmptyFieldsException } from '@/exception/EmptyFieldsException';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { DontKnowExceptionMsg } from '@/util/MessageConstants';
+import { AddProductDto } from './dto/AddProductDto';
+import { AddedProductDto } from './dto/AddedProductDto';
 
 @Injectable()
 export class ProductService {
@@ -15,31 +14,58 @@ export class ProductService {
 
   constructor(private prisma: PrismaService) {}
 
+  async addProduct(addProductDto: AddProductDto): Promise<AddedProductDto> {
+    this.logger.verbose('ADD PRODUCT');
+
+    return this.prisma.product
+      .create({
+        data: {
+          name: addProductDto.name,
+          categoryId: addProductDto.categoryId,
+        },
+      })
+      .catch((error) => {
+        this.logger.error(`name: ${error.name}\ncode: ${error.code}`);
+        if (error instanceof PrismaClientKnownRequestError) {
+          if (error.code == 'P2002') {
+            throw new HttpException(
+              'продукт с таким названеим уже существует',
+              HttpStatus.FORBIDDEN,
+            );
+          } else if (error.code == 'P2003') {
+            throw new HttpException(
+              'выбранной категории не существует',
+              HttpStatus.FORBIDDEN,
+            );
+          }
+        }
+        this.logger.error(error);
+      })
+      .then((result: AddedProductDto) => result);
+  }
+
   async addCategory(addCategoryDto: AddCategoryDto): Promise<CategoryDto> {
     this.logger.verbose('ADD CATEGORY DTO');
-    if (isEmpty(addCategoryDto.name)) {
-      throw new EmptyFieldsException('название категории не может быть пустым');
-    }
-
-    try {
-      return await this.prisma.category.create({
+    return this.prisma.category
+      .create({
         data: {
           name: addCategoryDto.name,
         },
-      });
-    } catch (error) {
-      if (error instanceof PrismaClientKnownRequestError) {
-        if (error['code'] == 'P2002') {
-          throw new HttpException(
-            'категория с таким названием уже существует',
-            HttpStatus.FORBIDDEN,
-          );
+      })
+      .catch((error) => {
+        if (error instanceof PrismaClientKnownRequestError) {
+          if (error['code'] == 'P2002') {
+            throw new HttpException(
+              'категория с таким названием уже существует',
+              HttpStatus.FORBIDDEN,
+            );
+          }
+        } else {
+          console.log(error);
+          throw new HttpException(DontKnowExceptionMsg, HttpStatus.BAD_GATEWAY);
         }
-      } else {
-        console.log(error);
-        throw new HttpException(DontKnowExceptionMsg, HttpStatus.BAD_GATEWAY);
-      }
-    }
+      })
+      .then((result: AddedProductDto) => result);
   }
 
   async getCategories(): Promise<CategoryDto[]> {

@@ -26,7 +26,7 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Post('signin')
-  @ApiOperation({ summary: 'request to validate data for sign in' })
+  @ApiOperation({ summary: 'запрос на вход' })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Success',
@@ -41,10 +41,9 @@ export class AuthController {
 
   @Post('signup')
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'request to validate data for sign up' })
+  @ApiOperation({ summary: 'запрос на регистрацию' })
   @ApiResponse({
     status: HttpStatus.CREATED,
-    description: 'Created',
     type: TokensDto,
   })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad Request' })
