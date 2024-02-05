@@ -90,6 +90,32 @@ export class ProductService {
       .then((result: AddedProductDto) => result);
   }
 
+  async deleteProductById(productId: number): Promise<string> {
+    this.logger.verbose('DELETE PRODUCT BY ID');
+    return this.prisma.product
+      .delete({
+        where: {
+          id: productId,
+        },
+      })
+      .catch((error) => {
+        this.logger.error(`name: ${error.name}\ncode: ${error.code}`);
+        this.logger.error(error);
+        if (error.code === 'P2025') {
+          throw new HttpException(
+            'выбранного продукта не существует',
+            HttpStatus.BAD_REQUEST,
+          );
+        } else {
+          throw new HttpException(
+            'что-то пошло не так',
+            HttpStatus.BAD_GATEWAY,
+          );
+        }
+      })
+      .then(() => 'продукт успешно удален');
+  }
+
   async addCategory(addCategoryDto: AddCategoryDto): Promise<CategoryDto> {
     this.logger.verbose('ADD CATEGORY DTO');
     return this.prisma.category

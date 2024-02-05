@@ -80,6 +80,26 @@ export class ProductController {
     return this.productService.editProduct(productId, editProductDto);
   }
 
+  @Delete('delete/:productId')
+  @ApiOperation({ summary: 'удаление продукта' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: String,
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    type: BadRequestDto,
+  })
+  async deleteProductById(
+    @Param('productId', ParseIntPipe) productId: number,
+  ): Promise<string> {
+    this.logger.verbose('DELETE PRODUCT BY Id');
+    return this.productService.deleteProductById(productId);
+  }
+
   @Post('category/add')
   @ApiOperation({ summary: 'добавление категории' })
   @ApiResponse({

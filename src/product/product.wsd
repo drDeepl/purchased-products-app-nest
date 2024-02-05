@@ -7,6 +7,7 @@ class ProductController {
   - logger: Logger
   + addProduct(addProductDto: AddProductDto): Promise<AddedProductDto>
   + addNewCategory(addCategory: AddCategoryDto): Promise<CategoryDto>
+  + editProduct(editProductDto: EditProductDto,productId: number): Promise<AddedProductDto> 
   + findCategories(): Promise<CategoryDto[]>
   + deleteCategoryById(categoryId: number)
   }
@@ -16,6 +17,8 @@ class ProductService {
   - prisma: PrismaService
 
   + addProduct(addProductDto: AddProductDto): Promise<AddedProductDto>
+  + editProduct(editProductDto: EditProductDto,productId: number): Promise<AddedProductDto> 
+  + deleteProduct(productId: number)
   + addCategory(addCategoryDto: AddCategoryDto): Promise<CategoryDto>
   + getCategories(): Promise<CategoryDto[]>
   + deleteCategory(categoryId: number)
@@ -37,6 +40,7 @@ class AddedProductDto{
 
 BaseProductDto <|-- AddProductDto
 BaseProductDto <|-- AddedProductDto
+BaseProductDto <|-- EditProductDto
 
 class BaseCategory{
     +name: string
