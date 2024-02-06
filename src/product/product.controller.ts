@@ -11,6 +11,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Put,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
@@ -23,13 +24,11 @@ import {
 import { AddCategoryDto } from './dto/AddCategoryDto';
 import { CategoryDto } from './dto/CategoryDto';
 import { ProductService } from './product.service';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import { DontKnowExceptionMsg } from '@/util/MessageConstants';
-import { Prisma } from '@prisma/client';
 import { AddProductDto } from './dto/AddProductDto';
 import { AddedProductDto } from './dto/AddedProductDto';
 import { BadRequestDto } from '@/dto/BadRequestDto';
 import { EditProductDto } from './dto/EditProductDto';
+import { EditCategoryDto } from './dto/EditCategoryDto';
 
 @ApiTags('ProductController')
 @UseGuards(AuthGuard('jwt'))
@@ -38,6 +37,24 @@ export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   private readonly logger = new Logger('ProductController');
+
+  @Get('all')
+  @ApiOperation({ summary: 'получение списка продуктов' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: [AddedProductDto],
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    type: BadRequestDto,
+  })
+  async getProducts(): Promise<AddedProductDto[]> {
+    this.logger.verbose('GET PRODUCTS');
+    return this.productService.getProducts();
+  }
 
   @Post('add')
   @ApiOperation({ summary: 'добавление продукта' })
@@ -131,6 +148,34 @@ export class ProductController {
   findCategories(): Promise<CategoryDto[]> {
     this.logger.verbose('FIND CATEGORIES');
     return this.productService.getCategories();
+  }
+
+  @Put('category/edit/:categoryId')
+  @ApiOperation({ summary: 'редактирование категории' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+
+    type: CategoryDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_GATEWAY,
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    type: BadRequestDto,
+  })
+  async editCategory(
+    @Param('categoryId', ParseIntPipe) categoryId: number,
+    @Body() editCategoryDto: EditCategoryDto,
+  ): Promise<CategoryDto> {
+    this.logger.error('EDIT CATEGORY');
+    return this.productService.editCategory(categoryId, editCategoryDto);
   }
 
   @Delete('category/delete/:categoryId')

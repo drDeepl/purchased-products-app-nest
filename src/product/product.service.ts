@@ -8,12 +8,27 @@ import { DontKnowExceptionMsg } from '@/util/MessageConstants';
 import { AddProductDto } from './dto/AddProductDto';
 import { AddedProductDto } from './dto/AddedProductDto';
 import { EditProductDto } from './dto/EditProductDto';
+import { PrintNameAndCodePrismaException } from '@/util/ExceptionUtils';
 
 @Injectable()
 export class ProductService {
   private readonly logger = new Logger('ProductService');
 
   constructor(private prisma: PrismaService) {}
+
+  async getProducts(): Promise<AddedProductDto[]> {
+    this.logger.verbose('GET PRODUCTS');
+    return this.prisma.product
+      .findMany({
+        orderBy: {
+          id: 'desc',
+        },
+      })
+      .catch((error) => {
+        PrintNameAndCodePrismaException(error, this.logger);
+      })
+      .then((result: AddedProductDto[]) => result);
+  }
 
   async addProduct(addProductDto: AddProductDto): Promise<AddedProductDto> {
     this.logger.verbose('ADD PRODUCT');
@@ -26,7 +41,7 @@ export class ProductService {
         },
       })
       .catch((error) => {
-        this.logger.error(`name: ${error.name}\ncode: ${error.code}`);
+        PrintNameAndCodePrismaException(error, this.logger);
         if (error instanceof PrismaClientKnownRequestError) {
           if (error.code == 'P2002') {
             throw new HttpException(
@@ -40,7 +55,6 @@ export class ProductService {
             );
           }
         }
-        this.logger.error(error);
       })
       .then((result: AddedProductDto) => result);
   }
@@ -61,8 +75,7 @@ export class ProductService {
         },
       })
       .catch((error) => {
-        this.logger.error(`name: ${error.name}\ncode: ${error.code}`);
-        this.logger.error(error);
+        PrintNameAndCodePrismaException(error, this.logger);
         if (error instanceof PrismaClientKnownRequestError) {
           if (error.code === 'P2002') {
             throw new HttpException(
@@ -99,8 +112,7 @@ export class ProductService {
         },
       })
       .catch((error) => {
-        this.logger.error(`name: ${error.name}\ncode: ${error.code}`);
-        this.logger.error(error);
+        PrintNameAndCodePrismaException(error, this.logger);
         if (error.code === 'P2025') {
           throw new HttpException(
             'выбранного продукта не существует',
@@ -125,6 +137,7 @@ export class ProductService {
         },
       })
       .catch((error) => {
+        PrintNameAndCodePrismaException(error, this.logger);
         if (error instanceof PrismaClientKnownRequestError) {
           if (error['code'] == 'P2002') {
             throw new HttpException(
@@ -155,7 +168,7 @@ export class ProductService {
         },
       })
       .catch((error) => {
-        this.logger.error(error);
+        PrintNameAndCodePrismaException(error, this.logger);
         if (error instanceof PrismaClientKnownRequestError) {
           throw new HttpException(
             'данной категории не существует',
@@ -171,17 +184,40 @@ export class ProductService {
   }
 
   async editCategory(
-    editCategoryDto: EditCategoryDto,
     categoryId: number,
+    editCategoryDto: EditCategoryDto,
   ): Promise<CategoryDto> {
     this.logger.verbose('EDIT CATEGORY');
-    return this.prisma.category.update({
-      data: {
-        name: editCategoryDto.name,
-      },
-      where: {
-        id: categoryId,
-      },
-    });
+    return this.prisma.category
+      .update({
+        data: {
+          name: editCategoryDto.name,
+        },
+        where: {
+          id: categoryId,
+        },
+      })
+      .catch((error) => {
+        PrintNameAndCodePrismaException(error, this.logger);
+        if (error instanceof PrismaClientKnownRequestError) {
+          if (error.code === 'P2002') {
+            throw new HttpException(
+              'выбранное имя уже существует',
+              HttpStatus.BAD_REQUEST,
+            );
+          } else if (error.code === 'P2003') {
+            throw new HttpException(
+              'выбранной категории не существует',
+              HttpStatus.BAD_REQUEST,
+            );
+          }
+        } else {
+          throw new HttpException(
+            'что-то пошло не так',
+            HttpStatus.BAD_GATEWAY,
+          );
+        }
+      })
+      .then((result: CategoryDto) => result);
   }
 }
