@@ -7,6 +7,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ProductModule } from './product/product.module';
 import { UserModule } from './user/user.module';
 import { MeasurementUnitModule } from './measurement-unit/measurement-unit.module';
+import { PurchasedProductModule } from './purchased-product/purchased-product.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { MeasurementUnitModule } from './measurement-unit/measurement-unit.modul
     PrismaModule,
     ProductModule,
     MeasurementUnitModule,
+    PurchasedProductModule,
   ],
   controllers: [AppController],
   providers: [AppService],

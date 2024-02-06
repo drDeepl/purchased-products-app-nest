@@ -1,5 +1,10 @@
 import { PrismaService } from '@/prisma/prisma.service';
-import { ForbiddenException, Injectable, Logger } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
@@ -83,20 +88,21 @@ export class AuthService {
 
   async signIn(dto: SignInDto): Promise<Tokens> {
     this.logger.verbose('signIn');
-    const user = await this.prisma.user.findUnique({
+
+    const user = await this.prisma.user.findFirst({
       where: {
         username: dto.username,
       },
     });
     if (!user) {
-      throw new ForbiddenException('Access Denied');
+      throw new NotFoundException('данного пользователя не существует');
     }
     const passwordMatches = await bcrypt.compare(
       dto.password,
       user.passwordHash,
     );
     if (!passwordMatches) {
-      throw new ForbiddenException('Access Denied');
+      throw new ForbiddenException('неверный пароль');
     }
     const tokens = await this.getTokens(user.id, user.username, user.isAdmin);
     this.updateHashRefreshToken(user.id, tokens.refreshToken);
@@ -125,11 +131,11 @@ export class AuthService {
     });
     console.log(user);
     if (!user) {
-      throw new ForbiddenException('Access Denided');
+      throw new ForbiddenException('Пользователь не найден');
     }
 
     if (!user.refreshTokenHash) {
-      throw new ForbiddenException('Refresh token is empty');
+      throw new ForbiddenException('Refresh Token не найден');
     }
 
     const comparedRefreshToken = await bcrypt.compare(
@@ -137,7 +143,7 @@ export class AuthService {
       user.refreshTokenHash,
     );
     if (!comparedRefreshToken) {
-      throw new ForbiddenException('Access Denied');
+      throw new ForbiddenException('Не соответствие токена');
     }
 
     const tokens = await this.getTokens(user.id, user.username, user.isAdmin);

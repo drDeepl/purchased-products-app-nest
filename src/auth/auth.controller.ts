@@ -17,6 +17,7 @@ import { SignInDto } from './dto/signIn.dto';
 import { SignUpDto } from './dto/signUp.dto';
 import { TokensDto } from './dto/tokens.dto';
 import { Tokens } from './types';
+import { UserAccess } from '@/user/decorators/user.decorator';
 
 @ApiTags('Auth')
 @Controller('api/auth')
@@ -79,9 +80,9 @@ export class AuthController {
   @UseGuards(AuthGuard('jwt'))
   @Post('logout')
   @HttpCode(HttpStatus.OK)
-  logout(@Req() req: Request) {
+  logout(@UserAccess() userAccessData) {
     this.logger.verbose('logout');
-    const user = req.user;
-    this.authService.logout(user['sub']);
+    this.logger.verbose(userAccessData);
+    this.authService.logout(userAccessData['sub']);
   }
 }
