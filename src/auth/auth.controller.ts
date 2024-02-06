@@ -19,10 +19,10 @@ import { TokensDto } from './dto/tokens.dto';
 import { Tokens } from './types';
 import { UserAccess } from '@/user/decorators/user.decorator';
 
-@ApiTags('Auth')
+@ApiTags('AuthController')
 @Controller('api/auth')
 export class AuthController {
-  private readonly logger = new Logger('AUTH.CONTROLLER');
+  private readonly logger = new Logger('AuthController');
   constructor(private readonly authService: AuthService) {}
 
   @HttpCode(HttpStatus.OK)

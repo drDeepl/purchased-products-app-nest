@@ -54,6 +54,11 @@ export class ProductService {
               HttpStatus.FORBIDDEN,
             );
           }
+        } else {
+          throw new HttpException(
+            'что-то пошло не так',
+            HttpStatus.BAD_GATEWAY,
+          );
         }
       })
       .then((result: AddedProductDto) => result);
