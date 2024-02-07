@@ -23,4 +23,16 @@ export class BasePurchasedProductDto {
   @ApiProperty({ description: '', nullable: false })
   @IsNumber()
   price: number;
+
+  constructor(
+    productId: number,
+    count: number,
+    unitMeasurementId: number,
+    price: number,
+  ) {
+    this.productId = productId;
+    this.count = count;
+    this.unitMeasurementId = unitMeasurementId;
+    this.price = price;
+  }
 }

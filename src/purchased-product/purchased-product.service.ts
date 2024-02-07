@@ -6,6 +6,7 @@ import { PrintNameAndCodePrismaException } from '@/util/ExceptionUtils';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { fromUnixTime, formatISO } from 'date-fns';
 import { EditPurchasedProductDto } from './dto/EditPurchasedProductDto';
+import { addedPurchasedProductMapper } from './mapper/added-purchased-product.mapper';
 
 @Injectable()
 export class PurchasedProductService {
@@ -30,34 +31,49 @@ export class PurchasedProductService {
       .then((result: AddedPurchasedProductDto[]) => result);
   }
 
+  async getPurchasedProductByUserIdOnDate(userId: number, timestamp: number) {
+    this.logger.verbose('GET PURCHASED PRODUCTS ON DATE BY USER ID');
+    const isoStringDate: string = fromUnixTime(timestamp).toISOString();
+    return this.prisma.$queryRaw<
+      AddedPurchasedProductDto[]
+    >`SELECT * FROM purchased_products WHERE DATE(purchase_date) = DATE(${isoStringDate}) AND user_id = ${userId}`
+      .catch((error) => {
+        PrintNameAndCodePrismaException(error, this.logger);
+        if (error instanceof PrismaClientKnownRequestError) {
+          if (error.code === 'P2003') {
+            throw new HttpException(
+              'неверный товар или единица измерения',
+              HttpStatus.FORBIDDEN,
+            );
+          } else if (error.code === 'P2010') {
+            throw new HttpException(
+              'неверный формат даты',
+              HttpStatus.FORBIDDEN,
+            );
+          }
+        } else {
+          throw new HttpException(
+            'что-то пошло не так',
+            HttpStatus.BAD_GATEWAY,
+          );
+        }
+      })
+      .then((result: AddedPurchasedProductDto[]) => result);
+  }
+
   async addPurchasedProduct(
     userId: number,
     addPurchasedProductDto: AddPurchasedProductDto,
   ): Promise<AddedPurchasedProductDto> {
-    const date = fromUnixTime(addPurchasedProductDto.purchaseDate);
-    return this.prisma.purchasedProduct
-      .create({
-        select: {
-          userId: true,
-          productId: true,
-          count: true,
-          unitMeasurementId: true,
-          price: true,
-          purchaseDate: true,
-        },
-        data: {
-          userId: userId,
-          productId: addPurchasedProductDto.productId,
-          count: addPurchasedProductDto.count,
-          unitMeasurementId: addPurchasedProductDto.unitMeasurementId,
-          price: addPurchasedProductDto.price,
-          purchaseDate: date,
-        },
-      })
+    return this.prisma.$queryRaw<AddedPurchasedProductDto>`
+    INSERT INTO purchased_products(user_id,product_id,count,unit_measurement_id,price,purchase_date)
+    VALUES(${userId},${addPurchasedProductDto.productId},${addPurchasedProductDto.count},${addPurchasedProductDto.unitMeasurementId},${addPurchasedProductDto.price}, TO_TIMESTAMP(${addPurchasedProductDto.purchaseDate}))
+    RETURNING *;
+    `
       .catch((error) => {
         PrintNameAndCodePrismaException(error, this.logger);
         if (error instanceof PrismaClientKnownRequestError) {
-          if (error.code == 'P2003') {
+          if (error.code == 'P2010') {
             throw new HttpException(
               'неверный товар или единица измерения',
               HttpStatus.FORBIDDEN,
@@ -70,7 +86,7 @@ export class PurchasedProductService {
           );
         }
       })
-      .then((result: AddedPurchasedProductDto) => result);
+      .then((result) => addedPurchasedProductMapper(result[0]));
   }
 
   async editPurchasedProduct(

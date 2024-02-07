@@ -10,6 +10,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { PurchasedProductService } from './purchased-product.service';
@@ -21,6 +22,7 @@ import { AddPurchasedProductDto } from './dto/AddPurchasedProductDto';
 import { BadRequestDto } from '@/dto/BadRequestDto';
 import { SimpleRequestExceptionDto } from '@/dto/SimpleRequestExceptionDto';
 import { EditPurchasedProductDto } from './dto/EditPurchasedProductDto';
+import { timeStamp } from 'console';
 
 @ApiTags('PurchasedProductController')
 @UseGuards(AuthGuard('jwt'))
@@ -54,6 +56,31 @@ export class PurchasedProductController {
     } else {
       throw new ForbiddenException('недостаточно прав');
     }
+  }
+
+  @Get('/all/date/:userId')
+  @ApiOperation({
+    summary: 'получение списка купленных товаров, выбранного пользователя',
+  })
+  @ApiResponse({ status: HttpStatus.OK, type: AddedPurchasedProductDto })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    type: SimpleRequestExceptionDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    type: BadRequestDto,
+  })
+  async getPurchasedProductsOnDateByUserId(
+    @Param('userId', ParseIntPipe) userId: number,
+    @Query('timestamp', ParseIntPipe) timestamp: number,
+  ) {
+    this.logger.verbose('GET PURCHASED PRODUCTS ON DATE BY USER ID');
+    this.logger.verbose(`timestamp: ${timestamp}`);
+    return this.purchasedProductService.getPurchasedProductByUserIdOnDate(
+      userId,
+      timestamp,
+    );
   }
 
   @Post('/add')

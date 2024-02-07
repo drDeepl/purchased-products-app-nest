@@ -12,4 +12,17 @@ export class EditPurchasedProductDto extends BasePurchasedProductDto {
   @ApiProperty({ description: '', nullable: false })
   @IsInt()
   purchaseDate: EpochTimeStamp;
+
+  constructor(
+    productId: number,
+    count: number,
+    unitMeasurementId: number,
+    price: number,
+    userId: number,
+    purchaseDate: EpochTimeStamp,
+  ) {
+    super(productId, count, unitMeasurementId, price);
+    this.userId = userId;
+    this.purchaseDate = purchaseDate;
+  }
 }

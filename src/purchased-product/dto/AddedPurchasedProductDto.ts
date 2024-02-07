@@ -18,4 +18,19 @@ export class AddedPurchasedProductDto extends BasePurchasedProductDto {
   @ApiProperty({ description: '', nullable: false })
   @IsDate()
   purchaseDate: Date;
+
+  constructor(
+    id: number,
+    productId: number,
+    count: number,
+    unitMeasurementId: number,
+    price: number,
+    userId: number,
+    purchaseDate: Date,
+  ) {
+    super(productId, count, unitMeasurementId, price);
+    this.id = id;
+    this.userId = userId;
+    this.purchaseDate = purchaseDate;
+  }
 }
