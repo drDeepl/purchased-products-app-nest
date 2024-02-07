@@ -7,6 +7,7 @@ import {
   Logger,
   Post,
   Req,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
@@ -18,6 +19,8 @@ import { SignUpDto } from './dto/signUp.dto';
 import { TokensDto } from './dto/tokens.dto';
 import { Tokens } from './types';
 import { UserAccess } from '@/user/decorators/user.decorator';
+import { BadRequestDto } from '@/dto/BadRequestDto';
+import { BaseRequestExceptionDto } from '@/dto/BaseRequestExceptionDto';
 
 @ApiTags('AuthController')
 @Controller('api/auth')
@@ -31,7 +34,7 @@ export class AuthController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Success',
-    type: UserDto,
+    type: TokensDto,
   })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad Request' })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
@@ -75,8 +78,16 @@ export class AuthController {
     status: HttpStatus.OK,
     description: 'Success',
   })
-  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad Request' })
-  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Bad Request',
+    type: BadRequestDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Unauthorized',
+    type: BaseRequestExceptionDto,
+  })
   @UseGuards(AuthGuard('jwt'))
   @Post('logout')
   @HttpCode(HttpStatus.OK)

@@ -29,6 +29,7 @@ import { AddedProductDto } from './dto/AddedProductDto';
 import { BadRequestDto } from '@/dto/BadRequestDto';
 import { EditProductDto } from './dto/EditProductDto';
 import { EditCategoryDto } from './dto/EditCategoryDto';
+import { SimpleRequestExceptionDto } from '@/dto/SimpleRequestExceptionDto';
 
 @ApiTags('ProductController')
 @UseGuards(AuthGuard('jwt'))
@@ -38,7 +39,7 @@ export class ProductController {
 
   private readonly logger = new Logger('ProductController');
 
-  @Get('all')
+  @Get('/all')
   @ApiOperation({ summary: 'получение списка продуктов' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -46,6 +47,7 @@ export class ProductController {
   })
   @ApiResponse({
     status: HttpStatus.UNAUTHORIZED,
+    type: SimpleRequestExceptionDto,
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
@@ -56,14 +58,15 @@ export class ProductController {
     return this.productService.getProducts();
   }
 
-  @Post('add')
+  @Post('/add')
   @ApiOperation({ summary: 'добавление продукта' })
   @ApiResponse({
     status: HttpStatus.OK,
-    type: CategoryDto,
+    type: AddedProductDto,
   })
   @ApiResponse({
     status: HttpStatus.UNAUTHORIZED,
+    type: SimpleRequestExceptionDto,
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
@@ -76,14 +79,15 @@ export class ProductController {
     return this.productService.addProduct(addProductDto);
   }
 
-  @Post('edit/:productId')
-  @ApiOperation({ summary: 'добавление продукта' })
+  @Post('/edit/:productId')
+  @ApiOperation({ summary: 'редактирование продукта' })
   @ApiResponse({
     status: HttpStatus.OK,
     type: AddedProductDto,
   })
   @ApiResponse({
     status: HttpStatus.UNAUTHORIZED,
+    type: SimpleRequestExceptionDto,
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
@@ -97,24 +101,22 @@ export class ProductController {
     return this.productService.editProduct(productId, editProductDto);
   }
 
-  @Delete('delete/:productId')
+  @Delete('/delete/:productId')
   @ApiOperation({ summary: 'удаление продукта' })
   @ApiResponse({
     status: HttpStatus.OK,
-    type: String,
   })
   @ApiResponse({
     status: HttpStatus.UNAUTHORIZED,
+    type: SimpleRequestExceptionDto,
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
     type: BadRequestDto,
   })
-  async deleteProductById(
-    @Param('productId', ParseIntPipe) productId: number,
-  ): Promise<string> {
+  async deleteProductById(@Param('productId', ParseIntPipe) productId: number) {
     this.logger.verbose('DELETE PRODUCT BY Id');
-    return this.productService.deleteProductById(productId);
+    this.productService.deleteProductById(productId);
   }
 
   @Post('category/add')
@@ -125,6 +127,7 @@ export class ProductController {
   })
   @ApiResponse({
     status: HttpStatus.UNAUTHORIZED,
+    type: SimpleRequestExceptionDto,
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
@@ -142,15 +145,15 @@ export class ProductController {
   @ApiOperation({ summary: 'получение списка категорий' })
   @ApiResponse({
     status: HttpStatus.OK,
-    type: CategoryDto,
+    type: [CategoryDto],
   })
-  @ApiResponse({ status: HttpStatus.UNAUTHORIZED })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: BadRequestDto })
   findCategories(): Promise<CategoryDto[]> {
     this.logger.verbose('FIND CATEGORIES');
     return this.productService.getCategories();
   }
 
-  @Put('category/edit/:categoryId')
+  @Post('category/edit/:categoryId')
   @ApiOperation({ summary: 'редактирование категории' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -159,12 +162,15 @@ export class ProductController {
   })
   @ApiResponse({
     status: HttpStatus.UNAUTHORIZED,
+    type: BadRequestDto,
   })
   @ApiResponse({
     status: HttpStatus.BAD_GATEWAY,
+    type: SimpleRequestExceptionDto,
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
+    type: SimpleRequestExceptionDto,
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
@@ -182,24 +188,28 @@ export class ProductController {
   @ApiOperation({ summary: 'удаление категории' })
   @ApiResponse({
     status: HttpStatus.OK,
-
-    type: CategoryDto,
   })
   @ApiResponse({
     status: HttpStatus.UNAUTHORIZED,
+    type: SimpleRequestExceptionDto,
   })
   @ApiResponse({
     status: HttpStatus.BAD_GATEWAY,
+    type: SimpleRequestExceptionDto,
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
+    type: SimpleRequestExceptionDto,
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
     type: BadRequestDto,
   })
-  async deleteCategoryById(@Param('categoryId') categoryId: number) {
+  async deleteCategoryById(
+    @Param('categoryId', ParseIntPipe) categoryId: number,
+  ) {
     this.logger.verbose('DELETE CATEGORY');
-    return this.productService.deleteCategory(Number(categoryId));
+
+    this.productService.deleteCategory(categoryId);
   }
 }
