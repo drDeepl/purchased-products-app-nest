@@ -35,7 +35,7 @@ export class UserController {
   @HttpCode(HttpStatus.FORBIDDEN)
   getCurrentUserInfo(@UserAccess() userAccessTokenData): Promise<UserDto> {
     this.logger.verbose('GET CURRENT USER INFO');
-    const userId = userAccessTokenData.sub;
+    const userId = userAccessTokenData.id;
     return this.userService.findById(userId);
   }
 
@@ -65,7 +65,7 @@ export class UserController {
     @UserAccess() userAccessTokenData,
   ) {
     this.logger.verbose('deleteUser');
-    if (userId === userAccessTokenData.sub || userAccessTokenData.isAdmin) {
+    if (userId === userAccessTokenData.id || userAccessTokenData.isAdmin) {
       return this.userService.deleteUser(userId);
     }
     throw new HttpException('недостаточно прав', HttpStatus.FORBIDDEN);

@@ -50,7 +50,7 @@ export class PurchasedProductController {
     @UserAccess() userAccessData,
   ): Promise<AddedPurchasedProductDto[]> {
     this.logger.verbose('GET PURCHASED PRODUCTS');
-    if (userAccessData.isAdmin || userAccessData.sub === userId) {
+    if (userAccessData.isAdmin || userAccessData.id === userId) {
       return this.purchasedProductService.getPurchasedProductsByUserId(userId);
     } else {
       throw new ForbiddenException('недостаточно прав');
@@ -76,7 +76,7 @@ export class PurchasedProductController {
   ) {
     this.logger.verbose('GET PURCHASED PRODUCTS ON DATE BY USER ID');
     this.logger.verbose(`timestamp: ${timestamp}`);
-    const userId = Number(userAccessData.sub)
+    const userId = Number(userAccessData.id);
     return this.purchasedProductService.getPurchasedProductByUserIdOnDate(
       userId,
       timestamp,
@@ -129,7 +129,7 @@ export class PurchasedProductController {
     this.logger.verbose('EDIT PURCHASED PRODUCT DTO');
     if (
       userAccessData.isAdmin ||
-      editPurchasedProductDto.userId === userAccessData.sub
+      editPurchasedProductDto.userId === userAccessData.id
     ) {
       return this.purchasedProductService.editPurchasedProduct(
         purchasedProductId,

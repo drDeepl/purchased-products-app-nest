@@ -1,6 +1,8 @@
 import { PrismaService } from '@/prisma/prisma.service';
 import {
   ForbiddenException,
+  HttpException,
+  HttpStatus,
   Injectable,
   Logger,
   NotFoundException,
@@ -11,6 +13,8 @@ import * as bcrypt from 'bcrypt';
 import { SignInDto } from './dto/signIn.dto';
 import { SignUpDto } from './dto/signUp.dto';
 import { Tokens } from './types';
+import { PrintNameAndCodePrismaException } from '@/util/ExceptionUtils';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class AuthService {
@@ -33,8 +37,8 @@ export class AuthService {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(
         {
-          sub: userId,
-          username,
+          id: userId,
+          sub: username,
           isAdmin,
         },
         {
@@ -44,8 +48,8 @@ export class AuthService {
       ),
       this.jwtService.signAsync(
         {
-          sub: userId,
-          username,
+          id: userId,
+          sub: username,
           isAdmin,
         },
         {
@@ -73,17 +77,39 @@ export class AuthService {
 
   async signUp(dto: SignUpDto): Promise<Tokens> {
     this.logger.verbose('signUp');
-    const hashData = await this.hashData(dto.password);
-    const newUser = await this.prisma.user.create({
-      data: { username: dto.username, passwordHash: hashData, isAdmin: false },
-    });
-    const tokens = await this.getTokens(
-      newUser.id,
-      newUser.username,
-      newUser.isAdmin,
-    );
-    this.updateHashRefreshToken(newUser.id, tokens.refreshToken);
-    return tokens;
+    try {
+      const hashData = await this.hashData(dto.password);
+      const newUser = await this.prisma.user.create({
+        data: {
+          username: dto.username,
+          passwordHash: hashData,
+          isAdmin: false,
+        },
+      });
+      const tokens = await this.getTokens(
+        newUser.id,
+        newUser.username,
+        newUser.isAdmin,
+      );
+      this.updateHashRefreshToken(newUser.id, tokens.refreshToken);
+      return tokens;
+    } catch (error) {
+      PrintNameAndCodePrismaException(error, this.logger);
+      if (error instanceof PrismaClientKnownRequestError) {
+        if (error.code == 'P2002') {
+          throw new HttpException(
+            'пользователь с таким именем уже существует',
+            HttpStatus.FORBIDDEN,
+          );
+        }
+        throw new HttpException(
+          'произошла ошибка в работе базы данных',
+          HttpStatus.BAD_GATEWAY,
+        );
+      } else {
+        throw new HttpException('что-то пошло не так', HttpStatus.BAD_GATEWAY);
+      }
+    }
   }
 
   async signIn(dto: SignInDto): Promise<Tokens> {

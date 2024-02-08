@@ -46,14 +46,22 @@ export class UserService {
       .catch((error) => {
         this.logger.error(`name: ${error.name}\ncode: ${error.code}`);
         if (error instanceof PrismaClientKnownRequestError) {
-          if (error.code == 'P2003') {
+          if (error.code == 'P2025') {
             throw new HttpException(
               'данного пользователя не существует',
               HttpStatus.FORBIDDEN,
             );
           }
+          throw new HttpException(
+            'произошла ошибка в работе базы данных',
+            HttpStatus.BAD_GATEWAY,
+          );
+        } else {
+          throw new HttpException(
+            'что-то пошло не так',
+            HttpStatus.BAD_GATEWAY,
+          );
         }
-        this.logger.error(error);
       })
       .then(() => 'пользователь удален');
   }

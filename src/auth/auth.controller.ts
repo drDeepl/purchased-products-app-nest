@@ -70,7 +70,7 @@ export class AuthController {
   refresh(@Req() req: Request) {
     this.logger.verbose('refresh');
     const user = req.user;
-    return this.authService.refreshTokens(user['sub'], user['refreshToken']);
+    return this.authService.refreshTokens(user['id'], user['refreshToken']);
   }
 
   @ApiOperation({ summary: 'запрос на удаление refresh token у пользователя' })
@@ -94,6 +94,6 @@ export class AuthController {
   logout(@UserAccess() userAccessData) {
     this.logger.verbose('logout');
     this.logger.verbose(userAccessData);
-    this.authService.logout(userAccessData['sub']);
+    this.authService.logout(userAccessData['id']);
   }
 }
