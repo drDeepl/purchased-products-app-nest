@@ -1,6 +1,8 @@
-import { IsDate, IsInt } from 'class-validator';
+import { IsDate, IsInt, IsObject } from 'class-validator';
 import { BasePurchasedProductDto } from './BasePurchasedProductDto';
 import { ApiProperty } from '@nestjs/swagger';
+import { AddedProductDto } from '@/product/dto/AddedProductDto';
+import { AddedMeasurementUnitDto } from '@/measurement-unit/dto/AddedMeasurementUnitDto';
 
 export class AddedPurchasedProductDto extends BasePurchasedProductDto {
   @ApiProperty({ description: '', nullable: false })
@@ -16,20 +18,30 @@ export class AddedPurchasedProductDto extends BasePurchasedProductDto {
   userId: number;
 
   @ApiProperty({ description: '', nullable: false })
+  @IsObject()
+  product: AddedProductDto;
+
+  @ApiProperty({ description: '', nullable: false })
+  @IsObject()
+  unitMeasurement: AddedMeasurementUnitDto;
+
+  @ApiProperty({ description: '', nullable: false })
   @IsDate()
   purchaseDate: Date;
 
   constructor(
     id: number,
-    productId: number,
+    product: AddedProductDto,
     count: number,
-    unitMeasurementId: number,
+    unitMeasurement: AddedMeasurementUnitDto,
     price: number,
     userId: number,
     purchaseDate: Date,
   ) {
-    super(productId, count, unitMeasurementId, price);
+    super(count, price);
     this.id = id;
+    this.product = product;
+    this.unitMeasurement = unitMeasurement;
     this.userId = userId;
     this.purchaseDate = purchaseDate;
   }

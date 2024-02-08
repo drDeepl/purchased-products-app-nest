@@ -6,6 +6,18 @@ import { constructFrom } from 'date-fns';
 export class AddPurchasedProductDto extends BasePurchasedProductDto {
   @ApiProperty({ description: '', nullable: false })
   @IsInt({
+    message: 'номер продукта должен быть целым числом',
+  })
+  productId: number;
+
+  @ApiProperty({ description: '', nullable: false })
+  @IsInt({
+    message: 'номер единицы измерения должен быть целым числом',
+  })
+  unitMeasurementId: number;
+
+  @ApiProperty({ description: '', nullable: false })
+  @IsInt({
     message: 'дата покупки должна быть в виде целого числа',
   })
   purchaseDate: EpochTimeStamp;
@@ -17,7 +29,9 @@ export class AddPurchasedProductDto extends BasePurchasedProductDto {
     price: number,
     purchaseDate: EpochTimeStamp,
   ) {
-    super(productId, count, unitMeasurementId, price);
+    super(count, price);
+    this.productId = productId;
+    this.unitMeasurementId = unitMeasurementId;
     this.purchaseDate = purchaseDate;
   }
 }

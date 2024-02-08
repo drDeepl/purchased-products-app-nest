@@ -1,4 +1,3 @@
-import { isDataView } from 'util/types';
 import { AddedPurchasedProductDto } from '../dto/AddedPurchasedProductDto';
 
 export function addedPurchasedProductMapper(
@@ -6,11 +5,11 @@ export function addedPurchasedProductMapper(
 ): AddedPurchasedProductDto {
   return new AddedPurchasedProductDto(
     data['id'],
-    data['product_id'],
+    data['product'],
     data['count'],
-    data['unit_measurement_id'],
+    data['unitMeasurement'],
     data['price'],
-    data['user_id'],
-    data['purchase_date'],
+    data['userId'],
+    data['purchaseDate'],
   );
 }

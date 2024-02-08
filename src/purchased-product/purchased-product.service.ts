@@ -4,7 +4,7 @@ import { AddPurchasedProductDto } from './dto/AddPurchasedProductDto';
 import { AddedPurchasedProductDto } from './dto/AddedPurchasedProductDto';
 import { PrintNameAndCodePrismaException } from '@/util/ExceptionUtils';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import { fromUnixTime, formatISO } from 'date-fns';
+import { fromUnixTime } from 'date-fns';
 import { EditPurchasedProductDto } from './dto/EditPurchasedProductDto';
 import { addedPurchasedProductMapper } from './mapper/added-purchased-product.mapper';
 
@@ -20,6 +20,15 @@ export class PurchasedProductService {
     this.logger.verbose('GET PURCHASED PRODUCTS');
     return this.prisma.purchasedProduct
       .findMany({
+        select: {
+          id: true,
+          userId: true,
+          product: true,
+          unitMeasurement: true,
+          count: true,
+          price: true,
+          purchaseDate: true,
+        },
         where: {
           userId: userId,
         },
@@ -65,11 +74,21 @@ export class PurchasedProductService {
     userId: number,
     addPurchasedProductDto: AddPurchasedProductDto,
   ): Promise<AddedPurchasedProductDto> {
-    return this.prisma.$queryRaw<AddedPurchasedProductDto>`
-    INSERT INTO purchased_products(user_id,product_id,count,unit_measurement_id,price,purchase_date)
-    VALUES(${userId},${addPurchasedProductDto.productId},${addPurchasedProductDto.count},${addPurchasedProductDto.unitMeasurementId},${addPurchasedProductDto.price}, TO_TIMESTAMP(${addPurchasedProductDto.purchaseDate}))
-    RETURNING *;
-    `
+    return this.prisma.purchasedProduct
+      .create({
+        data: {
+          userId: userId,
+          productId: addPurchasedProductDto.productId,
+          count: addPurchasedProductDto.count,
+          unitMeasurementId: addPurchasedProductDto.unitMeasurementId,
+          price: addPurchasedProductDto.price,
+          purchaseDate: fromUnixTime(addPurchasedProductDto.purchaseDate),
+        },
+        include: {
+          product: true,
+          unitMeasurement: true,
+        },
+      })
       .catch((error) => {
         PrintNameAndCodePrismaException(error, this.logger);
         if (error instanceof PrismaClientKnownRequestError) {
@@ -86,7 +105,7 @@ export class PurchasedProductService {
           );
         }
       })
-      .then((result) => addedPurchasedProductMapper(result[0]));
+      .then((result: any) => addedPurchasedProductMapper(result));
   }
 
   async editPurchasedProduct(
@@ -124,7 +143,7 @@ export class PurchasedProductService {
           );
         }
       })
-      .then((result: AddedPurchasedProductDto) => result);
+      .then((result) => addedPurchasedProductMapper(result));
   }
 
   async deletePurchasedProductById(id: number) {

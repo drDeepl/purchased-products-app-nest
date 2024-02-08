@@ -10,6 +10,18 @@ export class EditPurchasedProductDto extends BasePurchasedProductDto {
   userId: number;
 
   @ApiProperty({ description: '', nullable: false })
+  @IsInt({
+    message: 'номер продукта должен быть целым числом',
+  })
+  productId: number;
+
+  @ApiProperty({ description: '', nullable: false })
+  @IsInt({
+    message: 'номер еденицы измерения должен быть целым числом',
+  })
+  unitMeasurementId: number;
+
+  @ApiProperty({ description: '', nullable: false })
   @IsInt()
   purchaseDate: EpochTimeStamp;
 
@@ -21,7 +33,9 @@ export class EditPurchasedProductDto extends BasePurchasedProductDto {
     userId: number,
     purchaseDate: EpochTimeStamp,
   ) {
-    super(productId, count, unitMeasurementId, price);
+    super(count, price);
+    this.productId = productId;
+    this.unitMeasurementId = unitMeasurementId;
     this.userId = userId;
     this.purchaseDate = purchaseDate;
   }

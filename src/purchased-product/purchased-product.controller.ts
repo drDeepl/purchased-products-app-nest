@@ -22,7 +22,6 @@ import { AddPurchasedProductDto } from './dto/AddPurchasedProductDto';
 import { BadRequestDto } from '@/dto/BadRequestDto';
 import { SimpleRequestExceptionDto } from '@/dto/SimpleRequestExceptionDto';
 import { EditPurchasedProductDto } from './dto/EditPurchasedProductDto';
-import { timeStamp } from 'console';
 
 @ApiTags('PurchasedProductController')
 @UseGuards(AuthGuard('jwt'))
