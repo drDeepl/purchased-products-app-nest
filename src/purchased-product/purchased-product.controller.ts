@@ -57,7 +57,7 @@ export class PurchasedProductController {
     }
   }
 
-  @Get('/all/date/:userId')
+  @Get('/all/date')
   @ApiOperation({
     summary: 'получение списка купленных товаров, выбранного пользователя',
   })
@@ -71,11 +71,12 @@ export class PurchasedProductController {
     type: BadRequestDto,
   })
   async getPurchasedProductsOnDateByUserId(
-    @Param('userId', ParseIntPipe) userId: number,
+    @UserAccess() userAccessData,
     @Query('timestamp', ParseIntPipe) timestamp: number,
   ) {
     this.logger.verbose('GET PURCHASED PRODUCTS ON DATE BY USER ID');
     this.logger.verbose(`timestamp: ${timestamp}`);
+    const userId = Number(userAccessData.sub)
     return this.purchasedProductService.getPurchasedProductByUserIdOnDate(
       userId,
       timestamp,
