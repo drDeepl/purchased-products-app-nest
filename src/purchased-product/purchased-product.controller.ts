@@ -57,7 +57,7 @@ export class PurchasedProductController {
     }
   }
 
-  @Get('/all/date')
+  @Get('/date')
   @ApiOperation({
     summary: 'получение списка купленных товаров, выбранного пользователя',
   })
