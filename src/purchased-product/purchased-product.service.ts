@@ -8,6 +8,7 @@ import { fromUnixTime, endOfDay } from 'date-fns';
 import { EditPurchasedProductDto } from './dto/EditPurchasedProductDto';
 import { addedPurchasedProductMapper } from './mapper/added-purchased-product.mapper';
 import { MessageException } from '@/util/MessageException';
+import { MessageResponseDto } from '@/dto/MessageResponseDto';
 
 @Injectable()
 export class PurchasedProductService {
@@ -184,7 +185,7 @@ export class PurchasedProductService {
       .then((result: AddedPurchasedProductDto) => result);
   }
 
-  async deletePurchasedProductById(id: number) {
+  async deletePurchasedProductById(id: number): Promise<MessageResponseDto> {
     this.logger.verbose('DELETE PURCHASED PRODUCT BY ID');
     return this.prisma.purchasedProduct
       .delete({
@@ -208,6 +209,6 @@ export class PurchasedProductService {
           );
         }
       })
-      .then((result) => {});
+      .then((result) => new MessageResponseDto('запись успешно удалена'));
   }
 }
