@@ -30,6 +30,7 @@ import { BadRequestDto } from '@/dto/BadRequestDto';
 import { EditProductDto } from './dto/EditProductDto';
 import { EditCategoryDto } from './dto/EditCategoryDto';
 import { SimpleRequestExceptionDto } from '@/dto/SimpleRequestExceptionDto';
+import { MessageDto } from '@/dto/MessageDto';
 
 @ApiTags('ProductController')
 @UseGuards(AuthGuard('jwt'))
@@ -114,9 +115,11 @@ export class ProductController {
     status: HttpStatus.BAD_REQUEST,
     type: BadRequestDto,
   })
-  async deleteProductById(@Param('productId', ParseIntPipe) productId: number) {
+  async deleteProductById(
+    @Param('productId', ParseIntPipe) productId: number,
+  ): Promise<MessageDto> {
     this.logger.verbose('DELETE PRODUCT BY Id');
-    this.productService.deleteProductById(productId);
+    return this.productService.deleteProductById(productId);
   }
 
   @Post('category/add')
@@ -207,9 +210,8 @@ export class ProductController {
   })
   async deleteCategoryById(
     @Param('categoryId', ParseIntPipe) categoryId: number,
-  ) {
+  ): Promise<MessageDto> {
     this.logger.verbose('DELETE CATEGORY');
-
-    this.productService.deleteCategory(categoryId);
+    return this.productService.deleteCategory(categoryId);
   }
 }

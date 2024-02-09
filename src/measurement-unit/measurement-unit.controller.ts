@@ -15,6 +15,7 @@ import { MeasurementUnitService } from './measurement-unit.service';
 import { AddedMeasurementUnitDto } from './dto/AddedMeasurementUnitDto';
 import { AddMeasurementUnitDto } from './dto/AddMeasurementUnitDto';
 import { BadRequestDto } from '@/dto/BadRequestDto';
+import { MessageDto } from '@/dto/MessageDto';
 
 @ApiTags('MeasurementUnitController')
 @UseGuards(AuthGuard('jwt'))
@@ -65,7 +66,7 @@ export class MeasurementUnitController {
   @Delete('/delete/:measurementUnitId')
   async deleteMeasurementUnitById(
     @Param('measurementUnitId') measurementUnitId: number,
-  ) {
+  ): Promise<MessageDto> {
     return this.measurementUnitService.delete(Number(measurementUnitId));
   }
 }

@@ -9,6 +9,7 @@ import { AddedProductDto } from './dto/AddedProductDto';
 import { EditProductDto } from './dto/EditProductDto';
 import { PrintNameAndCodePrismaException } from '@/util/ExceptionUtils';
 import { MessageException } from '@/util/MessageException';
+import { MessageDto } from '@/dto/MessageDto';
 
 @Injectable()
 export class ProductService {
@@ -109,7 +110,7 @@ export class ProductService {
       .then((result: AddedProductDto) => result);
   }
 
-  async deleteProductById(productId: number): Promise<string> {
+  async deleteProductById(productId: number): Promise<MessageDto> {
     this.logger.verbose('DELETE PRODUCT BY ID');
     return this.prisma.product
       .delete({
@@ -131,7 +132,7 @@ export class ProductService {
           );
         }
       })
-      .then(() => 'продукт успешно удален');
+      .then(() => new MessageDto('продукт успешно удален'));
   }
 
   async addCategory(addCategoryDto: AddCategoryDto): Promise<CategoryDto> {
@@ -167,7 +168,7 @@ export class ProductService {
     return this.prisma.category.findMany();
   }
 
-  async deleteCategory(categoryId: number) {
+  async deleteCategory(categoryId: number): Promise<MessageDto> {
     this.logger.verbose('DELETE CATEGORY');
 
     return this.prisma.category
@@ -189,7 +190,8 @@ export class ProductService {
             HttpStatus.BAD_GATEWAY,
           );
         }
-      });
+      })
+      .then(() => new MessageDto('категория успешно удалена'));
   }
 
   async editCategory(

@@ -3,6 +3,7 @@ import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { UserDto } from './dto/UserDto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { MessageException } from '@/util/MessageException';
+import { MessageDto } from '@/dto/MessageDto';
 
 @Injectable()
 export class UserService {
@@ -41,7 +42,7 @@ export class UserService {
     return user;
   }
 
-  async deleteUser(userId: number): Promise<string> {
+  async deleteUser(userId: number): Promise<MessageDto> {
     this.logger.verbose('deleteUser');
     return this.prisma.user
       .delete({ where: { id: userId } })
@@ -65,6 +66,6 @@ export class UserService {
           );
         }
       })
-      .then(() => 'пользователь удален');
+      .then(() => new MessageDto('пользователь удален'));
   }
 }

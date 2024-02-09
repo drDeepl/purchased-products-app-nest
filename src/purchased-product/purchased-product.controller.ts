@@ -22,7 +22,7 @@ import { AddPurchasedProductDto } from './dto/AddPurchasedProductDto';
 import { BadRequestDto } from '@/dto/BadRequestDto';
 import { SimpleRequestExceptionDto } from '@/dto/SimpleRequestExceptionDto';
 import { EditPurchasedProductDto } from './dto/EditPurchasedProductDto';
-import { MessageResponseDto } from '@/dto/MessageResponseDto';
+import { MessageDto } from '@/dto/MessageDto';
 
 @ApiTags('PurchasedProductController')
 @UseGuards(AuthGuard('jwt'))
@@ -154,7 +154,7 @@ export class PurchasedProductController {
   })
   async deletePurchasedProductById(
     @Param('purchasedProductId', ParseIntPipe) purchasedProductId,
-  ): Promise<MessageResponseDto> {
+  ): Promise<MessageDto> {
     this.logger.verbose('DELETE PURCHASED PRODUCT BY ID');
     return this.purchasedProductService.deletePurchasedProductById(
       purchasedProductId,

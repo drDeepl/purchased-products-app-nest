@@ -16,6 +16,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { UserAccess } from './decorators/user.decorator';
 import { UserDto } from './dto/UserDto';
 import { UserService } from './user.service';
+import { MessageDto } from '@/dto/MessageDto';
 
 @ApiTags('UserController')
 @UseGuards(AuthGuard('jwt'))
@@ -63,7 +64,7 @@ export class UserController {
   deleteUser(
     @Param('userId', ParseIntPipe) userId: number,
     @UserAccess() userAccessTokenData,
-  ) {
+  ): Promise<MessageDto> {
     this.logger.verbose('deleteUser');
     if (userId === userAccessTokenData.id || userAccessTokenData.isAdmin) {
       return this.userService.deleteUser(userId);

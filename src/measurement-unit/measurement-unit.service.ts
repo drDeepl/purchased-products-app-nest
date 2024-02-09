@@ -7,6 +7,7 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 import { AddedMeasurementUnitDto } from './dto/AddedMeasurementUnitDto';
 import { MessageException } from '@/util/MessageException';
+import { MessageDto } from '@/dto/MessageDto';
 
 @Injectable()
 export class MeasurementUnitService {
@@ -57,7 +58,7 @@ export class MeasurementUnitService {
     });
   }
 
-  async delete(measurementUnitId: number) {
+  async delete(measurementUnitId: number): Promise<MessageDto> {
     this.logger.verbose('DELETE MEASUREMENT UNIT');
     return this.prisma.measurementUnit
       .delete({
@@ -78,6 +79,7 @@ export class MeasurementUnitService {
             HttpStatus.BAD_GATEWAY,
           );
         }
-      });
+      })
+      .then(() => new MessageDto('единица измерения успешно удалена'));
   }
 }
