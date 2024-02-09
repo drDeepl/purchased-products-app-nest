@@ -37,7 +37,10 @@ export class PurchasedProductService {
       })
       .catch((error) => {
         PrintNameAndCodePrismaException(error, this.logger);
-        throw new HttpException('что-то пошло не так', HttpStatus.BAD_GATEWAY);
+        throw new HttpException(
+          this.msgException.UnhandledError,
+          HttpStatus.BAD_GATEWAY,
+        );
       })
       .then((result: AddedPurchasedProductDto[]) => result);
   }
@@ -64,7 +67,7 @@ export class PurchasedProductService {
           }
         } else {
           throw new HttpException(
-            'что-то пошло не так',
+            this.msgException.UnhandledError,
             HttpStatus.BAD_GATEWAY,
           );
         }
@@ -140,7 +143,7 @@ export class PurchasedProductService {
           }
         } else {
           throw new HttpException(
-            'что-то пошло не так',
+            this.msgException.UnhandledError,
             HttpStatus.BAD_GATEWAY,
           );
         }
@@ -167,7 +170,7 @@ export class PurchasedProductService {
           }
         } else {
           throw new HttpException(
-            'что-то пошло не так',
+            this.msgException.UnhandledError,
             HttpStatus.BAD_GATEWAY,
           );
         }

@@ -15,10 +15,12 @@ import { SignUpDto } from './dto/signUp.dto';
 import { Tokens } from './types';
 import { PrintNameAndCodePrismaException } from '@/util/ExceptionUtils';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { MessageException } from '@/util/MessageException';
 
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger('AuthService');
+  private readonly msgException = new MessageException();
   constructor(
     private jwtService: JwtService,
     private configService: ConfigService,
@@ -107,7 +109,10 @@ export class AuthService {
           HttpStatus.BAD_GATEWAY,
         );
       } else {
-        throw new HttpException('что-то пошло не так', HttpStatus.BAD_GATEWAY);
+        throw new HttpException(
+          this.msgException.UnhandledError,
+          HttpStatus.BAD_GATEWAY,
+        );
       }
     }
   }

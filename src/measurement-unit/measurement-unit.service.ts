@@ -6,10 +6,12 @@ import { EmptyFieldsException } from '@/exception/EmptyFieldsException';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 import { AddedMeasurementUnitDto } from './dto/AddedMeasurementUnitDto';
+import { MessageException } from '@/util/MessageException';
 
 @Injectable()
 export class MeasurementUnitService {
   private readonly logger = new Logger('MeasurementUnitService');
+  private readonly msgException = new MessageException();
 
   constructor(private prisma: PrismaService) {}
 
@@ -72,7 +74,7 @@ export class MeasurementUnitService {
           );
         } else {
           throw new HttpException(
-            'что-то пошло не так',
+            this.msgException.UnhandledError,
             HttpStatus.BAD_GATEWAY,
           );
         }

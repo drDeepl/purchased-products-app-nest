@@ -2,10 +2,12 @@ import { PrismaService } from '@/prisma/prisma.service';
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { UserDto } from './dto/UserDto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { MessageException } from '@/util/MessageException';
 
 @Injectable()
 export class UserService {
   private readonly logger = new Logger('USERS.SERVICE');
+  private readonly msgException = new MessageException();
 
   constructor(private prisma: PrismaService) {}
 
@@ -58,7 +60,7 @@ export class UserService {
           );
         } else {
           throw new HttpException(
-            'что-то пошло не так',
+            this.msgException.UnhandledError,
             HttpStatus.BAD_GATEWAY,
           );
         }

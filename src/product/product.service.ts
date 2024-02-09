@@ -8,12 +8,14 @@ import { AddProductDto } from './dto/AddProductDto';
 import { AddedProductDto } from './dto/AddedProductDto';
 import { EditProductDto } from './dto/EditProductDto';
 import { PrintNameAndCodePrismaException } from '@/util/ExceptionUtils';
+import { MessageException } from '@/util/MessageException';
 
 @Injectable()
 export class ProductService {
-  private readonly logger = new Logger('ProductService');
-
   constructor(private prisma: PrismaService) {}
+
+  private readonly logger = new Logger('ProductService');
+  private readonly msgException = new MessageException();
 
   async getProducts(): Promise<AddedProductDto[]> {
     this.logger.verbose('GET PRODUCTS');
@@ -55,7 +57,7 @@ export class ProductService {
           }
         } else {
           throw new HttpException(
-            'что-то пошло не так',
+            this.msgException.UnhandledError,
             HttpStatus.BAD_GATEWAY,
           );
         }
@@ -99,7 +101,7 @@ export class ProductService {
           }
         } else {
           throw new HttpException(
-            'что-то пошло не так',
+            this.msgException.UnhandledError,
             HttpStatus.BAD_GATEWAY,
           );
         }
@@ -124,7 +126,7 @@ export class ProductService {
           );
         } else {
           throw new HttpException(
-            'что-то пошло не так',
+            this.msgException.UnhandledError,
             HttpStatus.BAD_GATEWAY,
           );
         }
@@ -183,7 +185,7 @@ export class ProductService {
           );
         } else {
           throw new HttpException(
-            'что-то пошло не так',
+            this.msgException.UnhandledError,
             HttpStatus.BAD_GATEWAY,
           );
         }
@@ -220,7 +222,7 @@ export class ProductService {
           }
         } else {
           throw new HttpException(
-            'что-то пошло не так',
+            this.msgException.UnhandledError,
             HttpStatus.BAD_GATEWAY,
           );
         }
