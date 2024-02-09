@@ -4,7 +4,7 @@ import { AddPurchasedProductDto } from './dto/AddPurchasedProductDto';
 import { AddedPurchasedProductDto } from './dto/AddedPurchasedProductDto';
 import { PrintNameAndCodePrismaException } from '@/util/ExceptionUtils';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import { fromUnixTime } from 'date-fns';
+import { fromUnixTime, endOfDay } from 'date-fns';
 import { EditPurchasedProductDto } from './dto/EditPurchasedProductDto';
 import { addedPurchasedProductMapper } from './mapper/added-purchased-product.mapper';
 import { MessageException } from '@/util/MessageException';
@@ -47,10 +47,29 @@ export class PurchasedProductService {
 
   async getPurchasedProductByUserIdOnDate(userId: number, timestamp: number) {
     this.logger.verbose('GET PURCHASED PRODUCTS ON DATE BY USER ID');
-    const isoStringDate: string = fromUnixTime(timestamp).toISOString();
-    return this.prisma.$queryRaw<
-      AddedPurchasedProductDto[]
-    >`SELECT * FROM purchased_products WHERE DATE(purchase_date) = DATE(${isoStringDate}) AND user_id = ${userId}`
+
+    const parsedDate = fromUnixTime(timestamp).toDateString();
+    const startSelectedDay: string = new Date(parsedDate).toISOString();
+    const endSelectedDay: string = endOfDay(parsedDate).toISOString();
+
+    return this.prisma.purchasedProduct
+      .findMany({
+        select: {
+          id: true,
+          product: true,
+          count: true,
+          unitMeasurement: true,
+          price: true,
+          userId: true,
+          purchaseDate: true,
+        },
+        where: {
+          purchaseDate: {
+            lte: endSelectedDay,
+            gte: startSelectedDay,
+          },
+        },
+      })
       .catch((error) => {
         PrintNameAndCodePrismaException(error, this.logger);
         if (error instanceof PrismaClientKnownRequestError) {
@@ -81,6 +100,15 @@ export class PurchasedProductService {
   ): Promise<AddedPurchasedProductDto> {
     return this.prisma.purchasedProduct
       .create({
+        select: {
+          id: true,
+          product: true,
+          count: true,
+          unitMeasurement: true,
+          price: true,
+          userId: true,
+          purchaseDate: true,
+        },
         data: {
           userId: userId,
           productId: addPurchasedProductDto.productId,
@@ -88,10 +116,6 @@ export class PurchasedProductService {
           unitMeasurementId: addPurchasedProductDto.unitMeasurementId,
           price: addPurchasedProductDto.price,
           purchaseDate: fromUnixTime(addPurchasedProductDto.purchaseDate),
-        },
-        include: {
-          product: true,
-          unitMeasurement: true,
         },
       })
       .catch((error) => {
@@ -110,7 +134,7 @@ export class PurchasedProductService {
           );
         }
       })
-      .then((result: any) => addedPurchasedProductMapper(result));
+      .then((result: any) => result);
   }
 
   async editPurchasedProduct(
@@ -122,6 +146,15 @@ export class PurchasedProductService {
     const date = fromUnixTime(editPurchasedProductDto.purchaseDate);
     return this.prisma.purchasedProduct
       .update({
+        select: {
+          id: true,
+          product: true,
+          count: true,
+          unitMeasurement: true,
+          price: true,
+          userId: true,
+          purchaseDate: true,
+        },
         where: { id: purchasedProductId },
         data: {
           userId: editPurchasedProductDto.userId,
@@ -148,7 +181,7 @@ export class PurchasedProductService {
           );
         }
       })
-      .then((result) => addedPurchasedProductMapper(result));
+      .then((result: AddedPurchasedProductDto) => result);
   }
 
   async deletePurchasedProductById(id: number) {
