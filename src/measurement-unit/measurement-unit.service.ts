@@ -4,7 +4,7 @@ import { AddMeasurementUnitDto } from './dto/AddMeasurementUnitDto';
 import { isEmpty } from 'class-validator';
 import { EmptyFieldsException } from '@/exception/EmptyFieldsException';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import { DontKnowExceptionMsg } from '@/util/MessageConstants';
+
 import { AddedMeasurementUnitDto } from './dto/AddedMeasurementUnitDto';
 
 @Injectable()
@@ -38,7 +38,10 @@ export class MeasurementUnitService {
           }
         } else {
           console.log(error);
-          throw new HttpException(DontKnowExceptionMsg, HttpStatus.BAD_GATEWAY);
+          throw new HttpException(
+            'непредвиденная ошибка',
+            HttpStatus.BAD_GATEWAY,
+          );
         }
       });
   }
@@ -48,7 +51,7 @@ export class MeasurementUnitService {
 
     return this.prisma.measurementUnit.findMany().catch((error) => {
       this.logger.error(error);
-      throw new HttpException(DontKnowExceptionMsg, HttpStatus.BAD_GATEWAY);
+      throw new HttpException('непредвиденная ошибка', HttpStatus.BAD_GATEWAY);
     });
   }
 

@@ -7,12 +7,14 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { fromUnixTime } from 'date-fns';
 import { EditPurchasedProductDto } from './dto/EditPurchasedProductDto';
 import { addedPurchasedProductMapper } from './mapper/added-purchased-product.mapper';
+import { MessageException } from '@/util/MessageException';
 
 @Injectable()
 export class PurchasedProductService {
   constructor(private prisma: PrismaService) {}
 
   private readonly logger = new Logger('PurchasedProductService');
+  private readonly msgException = new MessageException();
 
   async getPurchasedProductsByUserId(
     userId: number,
@@ -100,7 +102,7 @@ export class PurchasedProductService {
           }
         } else {
           throw new HttpException(
-            'что-то пошло не так',
+            this.msgException.UnhandledError,
             HttpStatus.BAD_GATEWAY,
           );
         }

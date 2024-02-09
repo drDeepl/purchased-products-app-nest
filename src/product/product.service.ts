@@ -4,7 +4,6 @@ import { AddCategoryDto } from './dto/AddCategoryDto';
 import { CategoryDto } from './dto/CategoryDto';
 import { EditCategoryDto } from './dto/EditCategoryDto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import { DontKnowExceptionMsg } from '@/util/MessageConstants';
 import { AddProductDto } from './dto/AddProductDto';
 import { AddedProductDto } from './dto/AddedProductDto';
 import { EditProductDto } from './dto/EditProductDto';
@@ -152,7 +151,10 @@ export class ProductService {
           }
         } else {
           console.log(error);
-          throw new HttpException(DontKnowExceptionMsg, HttpStatus.BAD_GATEWAY);
+          throw new HttpException(
+            'непредвиденная ошибка',
+            HttpStatus.BAD_GATEWAY,
+          );
         }
       })
       .then((result: AddedProductDto) => result);
