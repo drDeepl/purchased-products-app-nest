@@ -4,6 +4,10 @@
 
 ![schemadb](purchased_product_schema_db.png)
 
+### Диаграмма классов модуля Auth
+
+![schemadb](src/auth/auth.wsd)
+
 ## Установка
 
 ```bash
