@@ -104,7 +104,7 @@ export class PurchasedProductController {
   ): Promise<AddedPurchasedProductDto> {
     this.logger.verbose('ADD PURCHASED PRODUCT DTO');
     return this.purchasedProductService.addPurchasedProduct(
-      userAccessData.sub,
+      userAccessData.id,
       addPurchasedProductDto,
     );
   }
