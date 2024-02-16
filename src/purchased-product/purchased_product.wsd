@@ -1,0 +1,25 @@
+@startuml purchased_product
+
+class PurchasedProductService {
+  - prisma: PrismaService
+  - logger: Logger
+  - msgException: MessageException
+  + getPurchasedProductsByUserId(userId: number): Promise<AddedPurchasedProductDto[]>
+  + getPurchasedProductByUserIdOnDate(userId: number, timestamp: number)
+  + addPurchasedProduct(userId: number, addPurchasedProductDto: AddPurchasedProductDto): Promise<AddedPurchasedProductDto>
+}
+
+
+class PurchasedProductController {
+  - logger: Logger
+  - purchasedProductService: PurchasedProductService
+
+  + getPurchasedProductsByUserId(userId: number, userAccessData: any): Promise<AddedPurchasedProductDto[]>
+  + getPurchasedProductsOnDateByUserId(userAccessData: any, timestamp: number)
+  + addPurchasedProduct(userAccessData: any, addPurchasedProductDto: AddPurchasedProductDto): Promise<AddedPurchasedProductDto>
+  + editPurchasedProduct(purchasedProductId: number, userAccessData: any, editPurchasedProductDto: EditPurchasedProductDto)
+}
+
+PurchasedProductController --> PurchasedProductService
+
+@enduml
