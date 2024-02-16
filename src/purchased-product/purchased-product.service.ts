@@ -50,11 +50,6 @@ export class PurchasedProductService {
   async getPurchasedProductByUserIdOnDate(userId: number, timestamp: number) {
     this.logger.verbose('GET PURCHASED PRODUCTS ON DATE BY USER ID');
 
-    const localDateTime: ZonedDateTime = ZonedDateTime.ofInstant(
-      Instant.ofEpochMilli(timestamp),
-      ZoneId.SYSTEM,
-    );
-
     const zoneDateTimeUtil = new ZoneDateTimeUtil(timestamp);
 
     const startSelectedDay: string = zoneDateTimeUtil.getStartDay();

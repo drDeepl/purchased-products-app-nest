@@ -11,6 +11,7 @@ import {
   ParseIntPipe,
   Post,
   Query,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { PurchasedProductService } from './purchased-product.service';

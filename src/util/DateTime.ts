@@ -3,16 +3,22 @@ import {
   ZonedDateTime,
   ZoneId,
   DateTimeFormatter,
+  ZoneOffset,
+  ZoneRegion,
+  TemporalAccessor,
 } from '@js-joda/core';
 export class ZoneDateTimeUtil {
   private instant: Instant;
+
   constructor(epochMilli: number) {
     this.instant = Instant.ofEpochMilli(epochMilli);
   }
 
   getStartDay(): string {
     // const d = DateTimeFormatter.ofPattern('yyyy-MM-ddThh:mm:ss.Z');
+
     const zoneDateTime = ZonedDateTime.ofInstant(this.instant, ZoneId.SYSTEM)
+      .withZoneSameLocal(ZoneId.UTC)
       .withHour(0)
       .withMinute(0)
       .withSecond(0);
@@ -22,6 +28,7 @@ export class ZoneDateTimeUtil {
 
   getEndDay(): string {
     const zoneDateTime = ZonedDateTime.ofInstant(this.instant, ZoneId.SYSTEM)
+      .withZoneSameLocal(ZoneId.UTC)
       .withHour(23)
       .withMinute(59)
       .withSecond(59);
