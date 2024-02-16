@@ -17,8 +17,8 @@ export class ZoneDateTimeUtil {
   getStartDay(): string {
     // const d = DateTimeFormatter.ofPattern('yyyy-MM-ddThh:mm:ss.Z');
 
-    const zoneDateTime = ZonedDateTime.ofInstant(this.instant, ZoneId.SYSTEM)
-      .withZoneSameLocal(ZoneId.UTC)
+    const zoneDateTime = ZonedDateTime.ofInstant(this.instant, ZoneId.UTC)
+      .withZoneSameInstant(ZoneId.SYSTEM)
       .withHour(0)
       .withMinute(0)
       .withSecond(0);
@@ -27,8 +27,8 @@ export class ZoneDateTimeUtil {
   }
 
   getEndDay(): string {
-    const zoneDateTime = ZonedDateTime.ofInstant(this.instant, ZoneId.SYSTEM)
-      .withZoneSameLocal(ZoneId.UTC)
+    const zoneDateTime = ZonedDateTime.ofInstant(this.instant, ZoneId.UTC)
+      .withZoneSameInstant(ZoneId.SYSTEM)
       .withHour(23)
       .withMinute(59)
       .withSecond(59);
