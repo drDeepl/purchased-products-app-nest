@@ -6,9 +6,10 @@ import { PrintNameAndCodePrismaException } from '@/util/ExceptionUtils';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { fromUnixTime, endOfDay } from 'date-fns';
 import { EditPurchasedProductDto } from './dto/EditPurchasedProductDto';
-import { addedPurchasedProductMapper } from './mapper/added-purchased-product.mapper';
 import { MessageException } from '@/util/MessageException';
 import { MessageDto } from '@/dto/MessageDto';
+import { Instant, ZonedDateTime, ZoneId, nativeJs } from '@js-joda/core';
+import { ZoneDateTimeUtil } from '@/util/DateTime';
 
 @Injectable()
 export class PurchasedProductService {
@@ -49,9 +50,19 @@ export class PurchasedProductService {
   async getPurchasedProductByUserIdOnDate(userId: number, timestamp: number) {
     this.logger.verbose('GET PURCHASED PRODUCTS ON DATE BY USER ID');
 
-    const parsedDate = fromUnixTime(timestamp).toDateString();
-    const startSelectedDay: string = new Date(parsedDate).toISOString();
-    const endSelectedDay: string = endOfDay(parsedDate).toISOString();
+    const localDateTime: ZonedDateTime = ZonedDateTime.ofInstant(
+      Instant.ofEpochMilli(timestamp),
+      ZoneId.SYSTEM,
+    );
+
+    const zoneDateTimeUtil = new ZoneDateTimeUtil(timestamp);
+
+    const startSelectedDay: string = zoneDateTimeUtil.getStartDay();
+    const endSelectedDay: string = zoneDateTimeUtil.getEndDay();
+
+    this.logger.verbose(
+      `start of day${zoneDateTimeUtil.getStartDay()}\nend of day: ${endSelectedDay}`,
+    );
 
     return this.prisma.purchasedProduct
       .findMany({
@@ -65,6 +76,7 @@ export class PurchasedProductService {
           purchaseDate: true,
         },
         where: {
+          userId: userId,
           purchaseDate: {
             lte: endSelectedDay,
             gte: startSelectedDay,
