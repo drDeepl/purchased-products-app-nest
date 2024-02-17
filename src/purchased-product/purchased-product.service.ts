@@ -1,15 +1,14 @@
+import { MessageDto } from '@/dto/MessageDto';
 import { PrismaService } from '@/prisma/prisma.service';
+import { PrintNameAndCodePrismaException } from '@/util/ExceptionUtils';
+import { MessageException } from '@/util/MessageException';
+import { ZoneDateTimeUtil } from '@/util/ZoneDateTimeUtil';
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { fromUnixTime } from 'date-fns';
 import { AddPurchasedProductDto } from './dto/AddPurchasedProductDto';
 import { AddedPurchasedProductDto } from './dto/AddedPurchasedProductDto';
-import { PrintNameAndCodePrismaException } from '@/util/ExceptionUtils';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import { fromUnixTime, endOfDay } from 'date-fns';
 import { EditPurchasedProductDto } from './dto/EditPurchasedProductDto';
-import { MessageException } from '@/util/MessageException';
-import { MessageDto } from '@/dto/MessageDto';
-import { Instant, ZonedDateTime, ZoneId, nativeJs } from '@js-joda/core';
-import { ZoneDateTimeUtil } from '@/util/DateTime';
 
 @Injectable()
 export class PurchasedProductService {
@@ -56,7 +55,7 @@ export class PurchasedProductService {
     const endSelectedDay: string = zoneDateTimeUtil.getEndDay();
 
     this.logger.verbose(
-      `start of day${zoneDateTimeUtil.getStartDay()}\nend of day: ${endSelectedDay}`,
+      `start of day${startSelectedDay}\nend of day: ${endSelectedDay}`,
     );
 
     return this.prisma.purchasedProduct
@@ -106,6 +105,9 @@ export class PurchasedProductService {
     userId: number,
     addPurchasedProductDto: AddPurchasedProductDto,
   ): Promise<AddedPurchasedProductDto> {
+    const purchaseDate: string = new ZoneDateTimeUtil(
+      addPurchasedProductDto.purchaseDate,
+    ).toLocalString();
     return this.prisma.purchasedProduct
       .create({
         select: {
@@ -123,7 +125,7 @@ export class PurchasedProductService {
           count: addPurchasedProductDto.count,
           unitMeasurementId: addPurchasedProductDto.unitMeasurementId,
           price: addPurchasedProductDto.price,
-          purchaseDate: fromUnixTime(addPurchasedProductDto.purchaseDate),
+          purchaseDate: purchaseDate,
         },
       })
       .catch((error) => {
