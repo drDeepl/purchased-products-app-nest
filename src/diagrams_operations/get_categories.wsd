@@ -1,0 +1,11 @@
+@startuml get_categories
+
+skinparam backgroundColor #FFFFFF
+
+
+actor User
+actor System
+
+User -> System: getCategories()
+
+@enduml

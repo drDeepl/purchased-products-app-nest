@@ -1,0 +1,14 @@
+@startuml edit_category
+
+skinparam backgroundColor #FFFFFF
+
+
+actor User
+actor System
+
+User -> System: start
+User -> System: selectCategory(category)
+User -> System: setCategoryName(name)
+User -> System: editCategory(category)
+
+@enduml

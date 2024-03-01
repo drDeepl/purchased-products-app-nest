@@ -1,0 +1,11 @@
+@startuml logIn
+
+skinparam backgroundColor #FFFFFF
+
+
+actor User
+actor System
+
+User -> System: LogIn(username, password)
+
+@enduml

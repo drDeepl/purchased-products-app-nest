@@ -1,0 +1,11 @@
+@startuml register
+
+skinparam backgroundColor #FFFFFF
+
+
+actor User
+actor System
+
+User -> System: register(username, password)
+
+@enduml

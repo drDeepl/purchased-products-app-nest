@@ -1,0 +1,11 @@
+@startuml get_measurement_units
+
+skinparam backgroundColor #FFFFFF
+
+
+actor User
+actor System
+
+User -> System: getMeasurementUnits()
+
+@enduml

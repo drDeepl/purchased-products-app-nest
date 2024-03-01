@@ -1,0 +1,11 @@
+@startuml get_products
+
+skinparam backgroundColor #FFFFFF
+
+
+actor User
+actor System
+
+User -> System: getProducts()
+
+@enduml

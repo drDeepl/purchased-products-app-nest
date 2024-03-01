@@ -1,0 +1,12 @@
+@startuml delete_category
+
+skinparam backgroundColor #FFFFFF
+
+
+actor User
+actor System
+
+
+User -> System: deleteCategory(category)
+
+@enduml

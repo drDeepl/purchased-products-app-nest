@@ -1,0 +1,13 @@
+@startuml add_product
+
+skinparam backgroundColor #FFFFFF
+
+actor User
+actor System
+
+User -> System: start
+User -> System: setProductName(name)
+User -> System: setCategory(category)
+User -> System: addProduct(product)
+
+@enduml

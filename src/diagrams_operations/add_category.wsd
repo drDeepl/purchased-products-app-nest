@@ -1,0 +1,10 @@
+@startuml add_category
+skinparam backgroundColor #FFFFFF
+actor User
+actor System
+
+User -> System: start
+User -> System: setCategoryName(name)
+User -> System: addCategory(category)
+
+@enduml

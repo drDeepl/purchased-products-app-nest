@@ -1,0 +1,14 @@
+@startuml edit_product
+
+skinparam backgroundColor #FFFFFF
+
+
+actor User
+actor System
+
+User -> System: start
+User -> System: selectProduct(product)
+User -> System: setProductName(name)
+User -> System: editProduct(product)
+
+@enduml

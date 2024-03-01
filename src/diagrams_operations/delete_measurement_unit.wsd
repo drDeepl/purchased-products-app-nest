@@ -1,0 +1,13 @@
+@startuml delete_measurement_unit
+
+skinparam backgroundColor #FFFFFF
+
+
+actor User
+actor System
+
+
+User -> System: deleteMeasurementUnit(measurementUnit)
+
+
+@enduml

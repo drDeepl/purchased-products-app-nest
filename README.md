@@ -24,7 +24,7 @@
 
 ### Диаграмма классов модуля purchased-product
 
-![purchased_product](out\src\purchased-product\purchased_product\purchased_product.png)
+![purchased_product](out/src/purchased-product/purchased_product/purchased_product.png)
 
 ## Установка
 

@@ -1,0 +1,11 @@
+@startuml delete_product
+
+skinparam backgroundColor #FFFFFF
+
+
+actor User
+actor System
+
+User -> System: deleteProduct(product)
+
+@enduml

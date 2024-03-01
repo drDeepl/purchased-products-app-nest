@@ -1,0 +1,11 @@
+@startuml get_purchased_products_by_date
+
+skinparam backgroundColor #FFFFFF
+
+
+actor User
+actor System
+
+User -> System: getPurchasedProductsByDate(date)
+
+@enduml

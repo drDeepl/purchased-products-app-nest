@@ -1,0 +1,19 @@
+@startuml edit_purchased_product
+
+skinparam backgroundColor #FFFFFF
+
+
+actor User
+actor System
+
+
+User -> System: selectPurchasedProduct(purchasedProduct)
+User -> System: start
+User -> System: setProduct(product)
+User -> System: setCount(count)
+User -> System: setMeasurementUnit(measurementUnit)
+User -> System: setPrice(price)
+User -> System: setPurchaseDate(date)
+User -> System: editPurchasedProduct(product,count,measurementUnit, price, purchaseDate)
+
+@enduml
