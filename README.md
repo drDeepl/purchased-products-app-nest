@@ -62,7 +62,7 @@
 
 1. Пользовател вошел в систему
 
-![login](/src/diagrams_operations/diagrams_operations_img/login.png)
+![login](/src/diagrams_operations/diagrams_operations_img/logIn.png)
 
 ### Добавить новую категорию
 
