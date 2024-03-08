@@ -7,5 +7,6 @@ actor User
 actor System
 
 User -> System: deleteProduct(product)
+System -> User: deleteProductResponse
 
 @enduml

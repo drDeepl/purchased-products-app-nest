@@ -8,4 +8,5 @@ actor System
 
 
 User -> System: deletePurchasedProduct(purchasedProduct)
+System -> User: deletePurchasedProductResponse
 @enduml

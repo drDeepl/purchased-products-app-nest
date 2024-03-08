@@ -6,8 +6,9 @@ actor User
 actor System
 
 User -> System: start
-User -> System: setProductName(name)
-User -> System: setCategory(category)
-User -> System: addProduct(product)
+User -> System: addProduct(product_name, category)
+System -> User: isCategoryExistsResponse
+System -> User: productExistsResponse
+System -> User: end
 
 @enduml

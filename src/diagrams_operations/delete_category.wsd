@@ -8,5 +8,6 @@ actor System
 
 
 User -> System: deleteCategory(category)
+System -> User: deleteCategoryResponse
 
 @enduml

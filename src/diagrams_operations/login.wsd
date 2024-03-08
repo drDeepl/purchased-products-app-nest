@@ -6,6 +6,8 @@ skinparam backgroundColor #FFFFFF
 actor User
 actor System
 
+User -> System: start
 User -> System: LogIn(username, password)
-
+System -> User: isExistsUserResponse
+System -> User: end
 @enduml

@@ -1,11 +1,10 @@
 @startuml add_measurement_unit
 
-skinparam backgroundColor #FFFFFF
 
 actor User
 actor System
 
-User -> System: setMeasurementUnitName(name)
-User -> System: addMeasurementUnit(measurementUnit)
+User -> System: addMeasurementUnit(name)
+System -> User: existsMeasurementUnitResponse
 
 @enduml

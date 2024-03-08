@@ -7,11 +7,9 @@ actor User
 actor System
 
 User -> System: start
-User -> System: setProduct(product)
-User -> System: setCount(count)
-User -> System: setMeasurementUnit(measurementUnit)
-User -> System: setPrice(price)
-User -> System: setPurchaseDate(date)
 User -> System: addPurchasedProduct(product,count,measurementUnit, price, purchaseDate)
+System -> User: isProductExistsResponse
+System -> User: isMeasurementUnitExistsResponse
+System -> User: end
 
 @enduml

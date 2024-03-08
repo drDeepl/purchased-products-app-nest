@@ -7,8 +7,8 @@ actor User
 actor System
 
 User -> System: start
-User -> System: selectProduct(product)
-User -> System: setProductName(name)
-User -> System: editProduct(product)
+User -> System: editProduct(name,category)
+System -> User: editProductResponse
+System -> User: end
 
 @enduml

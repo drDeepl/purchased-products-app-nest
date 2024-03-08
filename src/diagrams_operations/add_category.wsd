@@ -3,8 +3,8 @@ skinparam backgroundColor #FFFFFF
 actor User
 actor System
 
-User -> System: start
-User -> System: setCategoryName(name)
-User -> System: addCategory(category)
+
+User -> System: addCategory(name)
+System -> User: categoryExistsResponse
 
 @enduml

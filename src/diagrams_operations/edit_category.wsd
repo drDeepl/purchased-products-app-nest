@@ -7,8 +7,7 @@ actor User
 actor System
 
 User -> System: start
-User -> System: selectCategory(category)
-User -> System: setCategoryName(name)
-User -> System: editCategory(category)
-
+User -> System: editCategory(name)
+System -> User: editCategoryResponse
+System -> User: end
 @enduml

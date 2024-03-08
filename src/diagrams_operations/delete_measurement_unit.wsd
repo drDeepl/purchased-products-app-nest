@@ -8,6 +8,7 @@ actor System
 
 
 User -> System: deleteMeasurementUnit(measurementUnit)
+System -> User: deleteMeasurementUnitResponse
 
 
 @enduml
