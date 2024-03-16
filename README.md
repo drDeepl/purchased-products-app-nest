@@ -13,7 +13,7 @@
 
 ## Модель предметной области
 
-<img src="out\diagram_model\diagram_model.png"/>
+<img src="out/out/diagram_model/diagram_model.png"/>
 
 ## Схема базы данных приложения
 
